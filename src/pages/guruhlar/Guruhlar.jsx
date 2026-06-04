@@ -705,35 +705,41 @@ function GroupDetail({ group: initialGroup, onBack }) {
     return () => { cancelled = true; };
   }, [initialGroup.id, darsliklarTab]);
 
-  const parseExamStudents = (res, status) => {
+  const parseExamStudents = (res, isFiltersiz = false) => {
     const d = res.data?.data ?? res.data;
-    if (status === "PENDING") {
-      // Filtersiz: data to'g'ridan array [{id, full_name}]
-      return Array.isArray(d) ? d.map((s) => ({ ...s, name: s.full_name ?? s.name })) : (d?.students ?? []);
+    if (isFiltersiz) {
+      return Array.isArray(d) ? d.map((s) => ({ ...s, name: s.full_name ?? s.name })) : [];
     }
     return Array.isArray(d?.students) ? d.students : Array.isArray(d) ? d : [];
   };
 
   const openExamDetail = (exam) => {
+    // Kutayotganlar: ?status=PENDING
     setExamView({ exam, statusTab: "PENDING", results: [], resultsLoading: true });
-    // Kutayotganlar: filtersiz
-    api.get(`/group/${initialGroup.id}/homework/${exam.id}/results`)
+    api.get(`/group/${initialGroup.id}/homework/${exam.id}/results`, { params: { status: "PENDING" } })
       .then((res) => {
-        setExamView((p) => ({ ...p, results: parseExamStudents(res, "PENDING"), resultsLoading: false }));
+        setExamView((p) => ({ ...p, results: parseExamStudents(res, false), resultsLoading: false }));
       })
       .catch(() => setExamView((p) => ({ ...p, resultsLoading: false })));
   };
 
   const fetchExamResults = (status) => {
-    setExamView((p) => ({ ...p, statusTab: status, results: [], resultsLoading: status !== "NOT_SUBMITTED" }));
-    if (status === "NOT_SUBMITTED") return;
-    // Kutayotganlar: filtersiz, boshqalari: status bilan
-    const config = status === "PENDING" ? {} : { params: { status } };
-    api.get(`/group/${initialGroup.id}/homework/${examView?.exam?.id}/results`, config)
-      .then((res) => {
-        setExamView((p) => ({ ...p, results: parseExamStudents(res, status), resultsLoading: false }));
-      })
-      .catch(() => setExamView((p) => ({ ...p, resultsLoading: false })));
+    setExamView((p) => ({ ...p, statusTab: status, results: [], resultsLoading: true }));
+
+    if (status === "NOT_SUBMITTED") {
+      // Bajarilmagan: filtersiz → topshirmaganlar
+      api.get(`/group/${initialGroup.id}/homework/${examView?.exam?.id}/results`)
+        .then((res) => {
+          setExamView((p) => ({ ...p, results: parseExamStudents(res, true), resultsLoading: false }));
+        })
+        .catch(() => setExamView((p) => ({ ...p, resultsLoading: false })));
+    } else {
+      api.get(`/group/${initialGroup.id}/homework/${examView?.exam?.id}/results`, { params: { status } })
+        .then((res) => {
+          setExamView((p) => ({ ...p, results: parseExamStudents(res, false), resultsLoading: false }));
+        })
+        .catch(() => setExamView((p) => ({ ...p, resultsLoading: false })));
+    }
   };
 
   const handleGrade = async () => {
@@ -782,20 +788,23 @@ function GroupDetail({ group: initialGroup, onBack }) {
       .catch(() => setHwResultModal((p) => ({ ...p, loading: false })));
   };
 
-  const parseHwStudents = (res) => {
+  const parseHwStudents = (res, isFiltersiz = false) => {
     const d = res.data?.data ?? res.data;
-    if (Array.isArray(d?.students)) return d.students;
-    if (Array.isArray(d)) return d.map((s) => ({ ...s, name: s.full_name ?? s.name }));
-    return [];
+    if (isFiltersiz) {
+      // Filtersiz: [{id, full_name}] — topshirmaganlar (Bajarilmagan)
+      return Array.isArray(d) ? d.map((s) => ({ ...s, name: s.full_name ?? s.name })) : [];
+    }
+    // Status bilan: {students: [...]}
+    return Array.isArray(d?.students) ? d.students : Array.isArray(d) ? d : [];
   };
 
   const openHwView = (hw) => {
+    // Kutayotganlar: ?status=PENDING (topshirgan, tekshirilmagan)
     setHwView({ hw, statusTab: "PENDING", results: [], resultsLoading: true });
     const hwId = hw.homework?.[0]?.id ?? hw.id;
-    // Kutayotganlar: filtersiz (barcha topshirganlar)
-    api.get(`/group/${initialGroup.id}/homework/${hwId}/results`)
+    api.get(`/group/${initialGroup.id}/homework/${hwId}/results`, { params: { status: "PENDING" } })
       .then((res) => {
-        setHwView((p) => p ? ({ ...p, results: parseHwStudents(res), resultsLoading: false }) : null);
+        setHwView((p) => p ? ({ ...p, results: parseHwStudents(res, false), resultsLoading: false }) : null);
       })
       .catch(() => setHwView((p) => p ? ({ ...p, resultsLoading: false }) : null));
   };
@@ -831,15 +840,23 @@ function GroupDetail({ group: initialGroup, onBack }) {
 
   const fetchHwResults = (status) => {
     const hwId = hwView?.hw?.homework?.[0]?.id ?? hwView?.hw?.id;
-    setHwView((p) => p ? ({ ...p, statusTab: status, results: [], resultsLoading: status !== "NOT_SUBMITTED" }) : null);
-    if (status === "NOT_SUBMITTED") return;
-    // Kutayotganlar: filtersiz, boshqalari: status bilan
-    const config = status === "PENDING" ? {} : { params: { status } };
-    api.get(`/group/${initialGroup.id}/homework/${hwId}/results`, config)
-      .then((res) => {
-        setHwView((p) => p ? ({ ...p, results: parseHwStudents(res), resultsLoading: false }) : null);
-      })
-      .catch(() => setHwView((p) => p ? ({ ...p, resultsLoading: false }) : null));
+    setHwView((p) => p ? ({ ...p, statusTab: status, results: [], resultsLoading: true }) : null);
+
+    if (status === "NOT_SUBMITTED") {
+      // Bajarilmagan: filtersiz → topshirmaganlar [{id, full_name}]
+      api.get(`/group/${initialGroup.id}/homework/${hwId}/results`)
+        .then((res) => {
+          setHwView((p) => p ? ({ ...p, results: parseHwStudents(res, true), resultsLoading: false }) : null);
+        })
+        .catch(() => setHwView((p) => p ? ({ ...p, resultsLoading: false }) : null));
+    } else {
+      // PENDING / ACCEPTED / REJECTED: status bilan
+      api.get(`/group/${initialGroup.id}/homework/${hwId}/results`, { params: { status } })
+        .then((res) => {
+          setHwView((p) => p ? ({ ...p, results: parseHwStudents(res, false), resultsLoading: false }) : null);
+        })
+        .catch(() => setHwView((p) => p ? ({ ...p, resultsLoading: false }) : null));
+    }
   };
   const [videos, setVideos] = useState(INIT_VIDEOS);
   const [videoModal, setVideoModal] = useState(false);
