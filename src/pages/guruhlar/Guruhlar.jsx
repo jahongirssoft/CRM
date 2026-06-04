@@ -2342,6 +2342,8 @@ export default function Guruhlar({ darkMode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [coursesList, setCoursesList] = useState([]);
   const [roomsList, setRoomsList] = useState([]);
+  const [apiTeachers, setApiTeachers] = useState([]);
+  const [apiStudents, setApiStudents] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
   // Refresh da saqlash: selectedGroup o'zgarganda sessionStorage ga yoz
@@ -2415,15 +2417,25 @@ export default function Guruhlar({ darkMode }) {
 
   const openAddModal = (type) => { setTempSel(type === "talaba" ? [...form.talabalar] : [...form.oqituvchilar]); setModalSearch(""); setAddModal(type); };
   const closeAddModal = () => setAddModal(null);
-  const toggleTempSel = (name) => setTempSel((p) => p.includes(name) ? p.filter((x) => x !== name) : [...p, name]);
+  const toggleTempSel = (item) => setTempSel((p) => p.find((x) => x.id === item.id) ? p.filter((x) => x.id !== item.id) : [...p, item]);
   const confirmModal  = () => { if (addModal === "talaba") set("talabalar", tempSel); if (addModal === "oqituvchi") set("oqituvchilar", tempSel); closeAddModal(); };
-  const modalList = () => { const list = addModal === "talaba" ? TALABALAR_LIST : OQITUVCHILAR_LIST; return list.filter((n) => n.toLowerCase().includes(modalSearch.toLowerCase())); };
+  const modalList = () => {
+    const raw = addModal === "talaba" ? apiStudents : apiTeachers;
+    const list = raw.length > 0
+      ? raw.map((x) => ({ id: x.id, name: x.full_name ?? x.name ?? "—" }))
+      : (addModal === "talaba" ? TALABALAR_LIST : OQITUVCHILAR_LIST).map((n) => ({ id: n, name: n }));
+    return list.filter((x) => x.name.toLowerCase().includes(modalSearch.toLowerCase()));
+  };
 
   const loadDrawerData = () => {
     if (coursesList.length === 0)
       api.get("/courses").then((r) => { const d = r.data?.data ?? r.data; setCoursesList(Array.isArray(d) ? d : []); }).catch(() => {});
     if (roomsList.length === 0)
       api.get("/rooms").then((r) => { const d = r.data?.data ?? r.data; setRoomsList(Array.isArray(d) ? d : []); }).catch(() => {});
+    if (apiTeachers.length === 0)
+      api.get("/teachers").then((r) => { const d = r.data?.data ?? r.data; setApiTeachers(Array.isArray(d) ? d : []); }).catch(() => {});
+    if (apiStudents.length === 0)
+      api.get("/students").then((r) => { const d = r.data?.data ?? r.data; setApiStudents(Array.isArray(d) ? d : []); }).catch(() => {});
   };
 
   const openDrawer     = () => { setEditId(null); setForm({ name: "", kurs: "", xona: "", kunlar: [], vaqt: "09:00", boshlanish: "", tavsif: "", talabalar: [], oqituvchilar: [] }); setDrawerOpen(true); loadDrawerData(); };
@@ -2447,8 +2459,8 @@ export default function Guruhlar({ darkMode }) {
     if (form.boshlanish)   body.start_date    = form.boshlanish;
     if (form.vaqt)         body.start_time    = form.vaqt;
     if (form.kunlar.length) body.week_day     = form.kunlar.map((k) => DAY_MAP[k] ?? k.toUpperCase());
-    const teacherIds = form.oqituvchilar.map(Number).filter(Boolean);
-    const studentIds = form.talabalar.map(Number).filter(Boolean);
+    const teacherIds = form.oqituvchilar.map((x) => typeof x === "object" ? x.id : Number(x)).filter(Boolean);
+    const studentIds = form.talabalar.map((x) => typeof x === "object" ? x.id : Number(x)).filter(Boolean);
     if (teacherIds.length) body.teachers = teacherIds;
     if (studentIds.length) body.students = studentIds;
 
@@ -2622,18 +2634,18 @@ export default function Guruhlar({ darkMode }) {
             <div style={{ maxHeight: 260, overflowY: "auto", borderTop: "1px solid var(--border, #f5f5f5)", borderBottom: "1px solid #f5f5f5" }}>
               {modalList().length === 0 ? (
                 <p style={{ fontSize: 13, color: "#9ca3af", textAlign: "center", padding: "20px 0" }}>Topilmadi</p>
-              ) : modalList().map((name) => {
-                const checked = tempSel.includes(name);
+              ) : modalList().map((item) => {
+                const checked = !!tempSel.find((x) => x.id === item.id);
                 return (
-                  <div key={name} onClick={() => toggleTempSel(name)}
+                  <div key={item.id} onClick={() => toggleTempSel(item)}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", borderBottom: "1px solid #f9f9f9" }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
                     <div style={{ width: 18, height: 18, borderRadius: 4, border: checked ? "none" : "1.5px solid #d1d5db", backgroundColor: checked ? PRIMARY : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s" }}>
                       {checked && <svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
                     </div>
-                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{name[0]}</div>
-                    <span style={{ fontSize: 13.5, color: "var(--text, #111)", fontWeight: checked ? 600 : 400 }}>{name}</span>
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{item.name[0]}</div>
+                    <span style={{ fontSize: 13.5, color: "var(--text, #111)", fontWeight: checked ? 600 : 400 }}>{item.name}</span>
                   </div>
                 );
               })}
@@ -2692,11 +2704,15 @@ export default function Guruhlar({ darkMode }) {
             <label style={{ fontSize: 13, fontWeight: 500, color: "#374151", display: "block", marginBottom: 8 }}>O&apos;qituvchilar</label>
             {form.oqituvchilar.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-                {form.oqituvchilar.map((n) => (
-                  <span key={n} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "#6d28d9", color: "#fff", fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
-                    {n}<button onClick={() => set("oqituvchilar", form.oqituvchilar.filter((x) => x !== n))} style={{ border: "none", background: "none", cursor: "pointer", color: "#fff", padding: 0, fontSize: 14, lineHeight: 1 }}>×</button>
-                  </span>
-                ))}
+                {form.oqituvchilar.map((item) => {
+                  const label = typeof item === "object" ? item.name : item;
+                  const key = typeof item === "object" ? item.id : item;
+                  return (
+                    <span key={key} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "#6d28d9", color: "#fff", fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
+                      {label}<button onClick={() => set("oqituvchilar", form.oqituvchilar.filter((x) => (typeof x === "object" ? x.id : x) !== key))} style={{ border: "none", background: "none", cursor: "pointer", color: "#fff", padding: 0, fontSize: 14, lineHeight: 1 }}>×</button>
+                    </span>
+                  );
+                })}
               </div>
             )}
             <button onClick={() => openAddModal("oqituvchi")} style={{ display: "flex", alignItems: "center", gap: 5, border: "none", background: "none", color: PRIMARY, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 0 }}><AddIcon style={{ fontSize: 16 }} /> Qo&apos;shish</button>
@@ -2705,11 +2721,15 @@ export default function Guruhlar({ darkMode }) {
             <label style={{ fontSize: 13, fontWeight: 500, color: "#374151", display: "block", marginBottom: 8 }}>Talabalar</label>
             {form.talabalar.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-                {form.talabalar.map((n) => (
-                  <span key={n} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "#6d28d9", color: "#fff", fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
-                    {n}<button onClick={() => set("talabalar", form.talabalar.filter((x) => x !== n))} style={{ border: "none", background: "none", cursor: "pointer", color: "#fff", padding: 0, fontSize: 14, lineHeight: 1 }}>×</button>
-                  </span>
-                ))}
+                {form.talabalar.map((item) => {
+                  const label = typeof item === "object" ? item.name : item;
+                  const key = typeof item === "object" ? item.id : item;
+                  return (
+                    <span key={key} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "#6d28d9", color: "#fff", fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
+                      {label}<button onClick={() => set("talabalar", form.talabalar.filter((x) => (typeof x === "object" ? x.id : x) !== key))} style={{ border: "none", background: "none", cursor: "pointer", color: "#fff", padding: 0, fontSize: 14, lineHeight: 1 }}>×</button>
+                    </span>
+                  );
+                })}
               </div>
             )}
             <button onClick={() => openAddModal("talaba")} style={{ display: "flex", alignItems: "center", gap: 5, border: "none", background: "none", color: PRIMARY, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 0 }}><AddIcon style={{ fontSize: 16 }} /> Qo&apos;shish</button>
