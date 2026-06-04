@@ -2340,6 +2340,8 @@ export default function Guruhlar({ darkMode }) {
   const [teacherCount, setTeacherCount] = useState(0);
   const [studentCount, setStudentCount] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [coursesList, setCoursesList] = useState([]);
+  const [roomsList, setRoomsList] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
   // Refresh da saqlash: selectedGroup o'zgarganda sessionStorage ga yoz
@@ -2417,8 +2419,15 @@ export default function Guruhlar({ darkMode }) {
   const confirmModal  = () => { if (addModal === "talaba") set("talabalar", tempSel); if (addModal === "oqituvchi") set("oqituvchilar", tempSel); closeAddModal(); };
   const modalList = () => { const list = addModal === "talaba" ? TALABALAR_LIST : OQITUVCHILAR_LIST; return list.filter((n) => n.toLowerCase().includes(modalSearch.toLowerCase())); };
 
-  const openDrawer     = () => { setEditId(null); setForm({ name: "", kurs: "", xona: "", kunlar: [], vaqt: "09:00", boshlanish: "", tavsif: "", talabalar: [], oqituvchilar: [] }); setDrawerOpen(true); };
-  const openEditDrawer = (g) => { setEditId(g.id); setForm({ name: g.name, kurs: "", xona: "", kunlar: [], vaqt: g.vaqt !== "—" ? g.vaqt : "09:00", boshlanish: "", tavsif: "", talabalar: [], oqituvchilar: [] }); setDrawerOpen(true); };
+  const loadDrawerData = () => {
+    if (coursesList.length === 0)
+      api.get("/courses").then((r) => { const d = r.data?.data ?? r.data; setCoursesList(Array.isArray(d) ? d : []); }).catch(() => {});
+    if (roomsList.length === 0)
+      api.get("/rooms").then((r) => { const d = r.data?.data ?? r.data; setRoomsList(Array.isArray(d) ? d : []); }).catch(() => {});
+  };
+
+  const openDrawer     = () => { setEditId(null); setForm({ name: "", kurs: "", xona: "", kunlar: [], vaqt: "09:00", boshlanish: "", tavsif: "", talabalar: [], oqituvchilar: [] }); setDrawerOpen(true); loadDrawerData(); };
+  const openEditDrawer = (g) => { setEditId(g.id); setForm({ name: g.name, kurs: "", xona: "", kunlar: [], vaqt: g.vaqt !== "—" ? g.vaqt : "09:00", boshlanish: "", tavsif: "", talabalar: [], oqituvchilar: [] }); setDrawerOpen(true); loadDrawerData(); };
   const closeDrawer    = () => { setDrawerOpen(false); setEditId(null); setFormError(""); };
 
   const DAY_MAP = {
@@ -2652,7 +2661,10 @@ export default function Guruhlar({ darkMode }) {
           <FInput label="Kurs" required>
             <div style={{ position: "relative" }}>
               <select value={form.kurs} onChange={(e) => set("kurs", e.target.value)} style={{ ...inputSx, appearance: "none", WebkitAppearance: "none", paddingRight: 36, cursor: "pointer" }} onFocus={focusBorder} onBlur={blurBorder}>
-                <option value="">Tanlang</option>{KURS_LIST.map((k) => <option key={k} value={k}>{k}</option>)}
+                <option value="">Tanlang</option>
+                {coursesList.length > 0
+                  ? coursesList.map((c) => <option key={c.id} value={c.id}>{c.name ?? c.title}</option>)
+                  : KURS_LIST.map((k) => <option key={k} value={k}>{k}</option>)}
               </select>
               <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af", fontSize: 12 }}>▼</span>
             </div>
@@ -2660,7 +2672,10 @@ export default function Guruhlar({ darkMode }) {
           <FInput label="Xona" required>
             <div style={{ position: "relative" }}>
               <select value={form.xona} onChange={(e) => set("xona", e.target.value)} style={{ ...inputSx, appearance: "none", WebkitAppearance: "none", paddingRight: 36, cursor: "pointer" }} onFocus={focusBorder} onBlur={blurBorder}>
-                <option value="">Tanlang</option>{XONA_LIST.map((x) => <option key={x} value={x}>{x}</option>)}
+                <option value="">Tanlang</option>
+                {roomsList.length > 0
+                  ? roomsList.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)
+                  : XONA_LIST.map((x) => <option key={x} value={x}>{x}</option>)}
               </select>
               <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af", fontSize: 12 }}>▼</span>
             </div>
