@@ -191,8 +191,8 @@ export default function Oqituvchilar() {
       ...initForm(),
       full_name: t.name !== "—" ? t.name : "",
       phone: t.phone !== "—" ? t.phone : "+998",
-      mail: t.email || "",
-      address: t.address || "",
+      mail: (t.email && t.email !== "—") ? t.email : "",
+      address: (t.address && t.address !== "—") ? t.address : "",
       groups: t.labels || [],
     });
     setDrawerOpen(true);
