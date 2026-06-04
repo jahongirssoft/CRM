@@ -382,7 +382,7 @@ export default function Oqituvchilar() {
 
                     {/* Guruh */}
                     <td style={{ ...cell, maxWidth: 220 }}>
-                      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 2, scrollbarWidth: "none" }}>
+                      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 4 }} className="badge-scroll">
                         {t.labels.map((l, li) => (
                           <span key={li} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, border: "1px solid #e5e7eb", color: "#374151", background: "#f9fafb", whiteSpace: "nowrap", flexShrink: 0 }}>
                             {l}
