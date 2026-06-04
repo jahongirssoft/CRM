@@ -76,6 +76,29 @@ const CALENDAR_DATES = [
 ];
 
 /* ─── Toggle ─── */
+/* ─── Grade Slider ─── */
+function GradeSlider({ value, onChange }) {
+  const pct = value;
+  const dots = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+  return (
+    <div style={{ position: "relative", height: 28, display: "flex", alignItems: "center" }}>
+      {/* Track */}
+      <div style={{ position: "absolute", left: 0, right: 0, height: 8, borderRadius: 99, background: `linear-gradient(to right, #16a34a ${pct}%, #d1d5db ${pct}%)`, overflow: "hidden" }}>
+        {/* Dots overlay */}
+        {dots.map((d) => (
+          <div key={d} style={{ position: "absolute", top: "50%", left: `${d}%`, transform: "translate(-50%,-50%)", width: 5, height: 5, borderRadius: "50%", background: "rgba(255,255,255,0.7)", pointerEvents: "none" }} />
+        ))}
+      </div>
+      {/* Thumb */}
+      <div style={{ position: "absolute", left: `${pct}%`, top: "50%", transform: "translate(-50%,-50%)", width: 22, height: 22, borderRadius: "50%", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,.2)", border: "2px solid #e5e7eb", zIndex: 2, pointerEvents: "none" }} />
+      {/* Hidden native input */}
+      <input type="range" min={0} max={100} value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        style={{ position: "absolute", inset: 0, width: "100%", opacity: 0, cursor: "pointer", zIndex: 3, margin: 0, height: "100%" }} />
+    </div>
+  );
+}
+
 function Toggle({ on, onChange }) {
   return (
     <div onClick={onChange} style={{ width: 38, height: 22, borderRadius: 11, background: on ? PRIMARY : "#d1d5db", position: "relative", cursor: "pointer", transition: "background .2s", flexShrink: 0 }}>
@@ -1619,9 +1642,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   <div style={{ marginBottom: 24 }}>
                     <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text,#111)", margin: "0 0 16px" }}>Ball</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <input type="range" min={0} max={100} value={hwStudentView.score}
-                        onChange={(e) => setHwStudentView((p) => ({ ...p, score: Number(e.target.value) }))}
-                        style={{ flex: 1, accentColor: "#16a34a", height: 6, cursor: "pointer" }} />
+                      <div style={{ flex: 1 }}>
+                        <GradeSlider value={hwStudentView.score} onChange={(v) => setHwStudentView((p) => ({ ...p, score: v }))} />
+                      </div>
                       <input type="number" min={0} max={100} value={hwStudentView.score}
                         onChange={(e) => setHwStudentView((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
                         style={{ width: 72, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg,#fff)", color: "var(--text,#111)" }} />
@@ -2196,9 +2219,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
               <div style={{ marginBottom: 24 }}>
                 <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text, #111)", margin: "0 0 16px" }}>Ball</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <input type="range" min={0} max={100} value={gradeModal.score}
-                    onChange={(e) => setGradeModal((p) => ({ ...p, score: Number(e.target.value) }))}
-                    style={{ flex: 1, accentColor: "#16a34a", height: 6, cursor: "pointer" }} />
+                  <div style={{ flex: 1 }}>
+                    <GradeSlider value={gradeModal.score} onChange={(v) => setGradeModal((p) => ({ ...p, score: v }))} />
+                  </div>
                   <input type="number" min={0} max={100} value={gradeModal.score}
                     onChange={(e) => setGradeModal((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
                     style={{ width: 72, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg, #fff)", color: "var(--text, #111)" }} />
