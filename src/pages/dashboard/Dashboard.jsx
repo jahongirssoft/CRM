@@ -72,20 +72,32 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { page: urlPage, id: urlId } = useParams();
 
-  // URL da guruh ID bo'lsa, sessionStorage ga yoz (refresh uchun)
+  // URL da group ID bo'lsa, sessionStorage ga yoz (refresh uchun)
   useEffect(() => {
-    if (urlPage === "guruhlar" && urlId) {
+    if (urlPage === "groups" && urlId) {
       sessionStorage.setItem("guruhlar_selected_id", urlId);
     }
   }, [urlPage, urlId]);
 
-  // URL → activePage mapping
+  // URL → activePage mapping (English URLs)
   const urlToPage = (p) => {
-    const map = { "oqituvchilar": "o'qituvchilar", "guruhlar": "guruhlar", "talabalar": "talabalar", "sovgalar": "sovg'alar", "boshqarish": "boshqarish" };
+    const map = {
+      "teachers":   "o'qituvchilar",
+      "groups":     "guruhlar",
+      "students":   "talabalar",
+      "gifts":      "sovg'alar",
+      "management": "boshqarish",
+    };
     return map[p] ?? "asosiy";
   };
   const pageToUrl = (p) => {
-    const map = { "o'qituvchilar": "oqituvchilar", "guruhlar": "guruhlar", "talabalar": "talabalar", "sovg'alar": "sovgalar", "boshqarish": "boshqarish" };
+    const map = {
+      "o'qituvchilar": "teachers",
+      "guruhlar":      "groups",
+      "talabalar":     "students",
+      "sovg'alar":     "gifts",
+      "boshqarish":    "management",
+    };
     return map[p] ?? "";
   };
 
@@ -765,7 +777,7 @@ const sidebarW = collapsed ? 64 : 230;
           ) : activePage === "guruhlar" ? (
             <Guruhlar darkMode={darkMode}
               onGroupSelect={(id) => {
-                const newPath = id ? `/dashboard/guruhlar/${id}` : "/dashboard/guruhlar";
+                const newPath = id ? `/dashboard/groups/${id}` : "/dashboard/groups";
                 if (window.location.pathname !== newPath)
                   window.history.replaceState(null, "", newPath);
               }}

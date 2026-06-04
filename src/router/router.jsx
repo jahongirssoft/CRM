@@ -11,11 +11,11 @@ function ProtectedRoute({ children }) {
 const Wrap = <ProtectedRoute><Dashboard /></ProtectedRoute>;
 
 const router = createBrowserRouter([
-  { path: "/",                      element: <Navigate to="/login" replace /> },
-  { path: "/login",                  element: <Login /> },
-  { path: "/dashboard",              element: Wrap },
-  { path: "/dashboard/:page",        element: Wrap },
-  { path: "/dashboard/:page/:id",    element: Wrap },
+  { path: "/",                       element: <Navigate to="/login" replace /> },
+  { path: "/login",                   element: <Login /> },
+  { path: "/dashboard",               element: Wrap },
+  { path: "/dashboard/:page",         element: Wrap },
+  { path: "/dashboard/:page/:id",     element: Wrap },
 ]);
 
 export default router;
