@@ -382,17 +382,12 @@ export default function Oqituvchilar() {
 
                     {/* Guruh */}
                     <td style={{ ...cell, maxWidth: 220 }}>
-                      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", alignItems: "center" }}>
-                        {t.labels.slice(0, 3).map((l, li) => (
-                          <span key={li} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, border: "1px solid #e5e7eb", color: "#374151", background: "#f9fafb", whiteSpace: "nowrap", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 2, scrollbarWidth: "none" }}>
+                        {t.labels.map((l, li) => (
+                          <span key={li} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, border: "1px solid #e5e7eb", color: "#374151", background: "#f9fafb", whiteSpace: "nowrap", flexShrink: 0 }}>
                             {l}
                           </span>
                         ))}
-                        {t.labels.length > 3 && (
-                          <span title={t.labels.slice(3).join(", ")} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, background: "#ede9fe", color: "#7c3aed", fontWeight: 600, whiteSpace: "nowrap", cursor: "default" }}>
-                            +{t.labels.length - 3}
-                          </span>
-                        )}
                       </div>
                     </td>
 

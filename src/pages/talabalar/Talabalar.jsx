@@ -353,17 +353,12 @@ export default function Talabalar() {
 
                     {/* Guruh */}
                     <td style={{ ...cell, maxWidth: 220 }}>
-                      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", alignItems: "center" }}>
-                        {s.groups.slice(0, 3).map((g, gi) => (
-                          <span key={gi} style={{ fontSize: 11, padding: "2px 7px", borderRadius: 6, background: gi === 0 ? "#f0fdf4" : "#f3f4f6", color: gi === 0 ? "#16a34a" : "#374151", border: `1px solid ${gi === 0 ? "#bbf7d0" : "#e5e7eb"}`, fontWeight: 500, whiteSpace: "nowrap", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 2, scrollbarWidth: "none" }}>
+                        {s.groups.map((g, gi) => (
+                          <span key={gi} style={{ fontSize: 11, padding: "2px 7px", borderRadius: 6, background: gi === 0 ? "#f0fdf4" : "#f3f4f6", color: gi === 0 ? "#16a34a" : "#374151", border: `1px solid ${gi === 0 ? "#bbf7d0" : "#e5e7eb"}`, fontWeight: 500, whiteSpace: "nowrap", flexShrink: 0 }}>
                             {g}
                           </span>
                         ))}
-                        {s.groups.length > 3 && (
-                          <span title={s.groups.slice(3).join(", ")} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, background: "#ede9fe", color: "#7c3aed", fontWeight: 600, whiteSpace: "nowrap", cursor: "default" }}>
-                            +{s.groups.length - 3}
-                          </span>
-                        )}
                       </div>
                     </td>
 
