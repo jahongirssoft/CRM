@@ -433,26 +433,38 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
     setSaving(true);
     setSaveError("");
     try {
-      // Dars mavzusi va tavsifini saqlash
+      // 1. Dars mavzusi saqlash
       await api.post("/lessons", {
         group_id: group.id,
         topic: mavzu,
         description: tavsif,
       });
-      // Davomat saqlash — har talaba uchun
-      await Promise.allSettled(
-        students.map((s) =>
-          api.post("/attendance", {
-            group_id: group.id,
-            student_id: s.id,
-            isPresent: attendance[s.id] ?? false,
-          })
-        )
-      );
+
+      // 2. Davomat — faqat toggle qilingan talabalar uchun
+      const attendanceEntries = students.filter((s) => attendance[s.id] !== undefined);
+      if (attendanceEntries.length > 0) {
+        const results = await Promise.allSettled(
+          attendanceEntries.map((s) =>
+            api.post("/attendance", {
+              group_id: group.id,
+              student_id: s.id,
+              isPresent: attendance[s.id] ?? false,
+            })
+          )
+        );
+        const failed = results.filter((r) => r.status === "rejected");
+        if (failed.length > 0) {
+          const msg = failed[0].reason?.response?.data?.message;
+          setSaveError(Array.isArray(msg) ? msg.join(", ") : (msg ?? `${failed.length} ta davomatni saqlashda xatolik`));
+          setSaving(false);
+          return;
+        }
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      setSaveError(err?.response?.data?.message ?? "Saqlashda xatolik yuz berdi");
+      const msg = err?.response?.data?.message;
+      setSaveError(Array.isArray(msg) ? msg.join(", ") : (msg ?? "Saqlashda xatolik yuz berdi"));
     } finally {
       setSaving(false);
     }
