@@ -429,20 +429,18 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
       })
       .catch(() => {});
 
-    // Avvalgi davomat ma'lumotlarini yuklash
+    // Avvalgi davomat — shu guruhning eng so'nggi yozuvlarini olish
     api.get("/attendance/all")
       .then((res) => {
         const data = res.data?.data ?? res.data;
         if (!Array.isArray(data)) return;
-        // Shu guruh va shu sanaga tegishli yozuvlarni topish
+        // Shu guruh uchun barcha yozuvlar, vaqt bo'yicha tartiblash
         const map = {};
         data
-          .filter((a) =>
-            Number(a.group_id) === Number(group.id) &&
-            a.created_at?.startsWith(dateStr)
-          )
+          .filter((a) => Number(a.group_id) === Number(group.id))
+          .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
           .forEach((a) => {
-            // Bir talaba uchun oxirgi yozuvni olish
+            // Har talaba uchun oxirgi yozuv ustunlik qiladi
             map[a.student_id] = a.isPresent;
           });
         if (Object.keys(map).length > 0) setAttendance(map);
@@ -462,22 +460,21 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
         description: tavsif,
       });
 
-      // 2. Davomat — faqat toggle qilingan talabalar uchun
-      const attendanceEntries = students.filter((s) => attendance[s.id] !== undefined);
-      if (attendanceEntries.length > 0) {
+      // 2. Davomat — barcha talabalar uchun (toggle qilinmagan = false)
+      if (students.length > 0) {
         const results = await Promise.allSettled(
-          attendanceEntries.map((s) =>
+          students.map((s) =>
             api.post("/attendance", {
               group_id: group.id,
               student_id: s.id,
-              isPresent: attendance[s.id] ?? false,
+              isPresent: attendance[s.id] === true,
             })
           )
         );
         const failed = results.filter((r) => r.status === "rejected");
-        if (failed.length > 0) {
+        if (failed.length === students.length) {
           const msg = failed[0].reason?.response?.data?.message;
-          setSaveError(Array.isArray(msg) ? msg.join(", ") : (msg ?? `${failed.length} ta davomatni saqlashda xatolik`));
+          setSaveError(Array.isArray(msg) ? msg.join(", ") : "Davomat saqlashda xatolik");
           setSaving(false);
           return;
         }
