@@ -220,7 +220,8 @@ export default function Oqituvchilar() {
       fd.append("phone", phone);
       fd.append("address", address);
       if (photoFile) fd.append("photo", photoFile);
-      if (groups.length) fd.append("groups", groups.join(","));
+      // groups faqat yangi yaratishda yuboriladi (PATCH da 500 beradi)
+      if (!isEdit && groups.length) fd.append("groups", groups.join(","));
       if (isEdit) {
         await api.patch(`/teachers/${editId}`, fd, {
           headers: { "Content-Type": "multipart/form-data" },
