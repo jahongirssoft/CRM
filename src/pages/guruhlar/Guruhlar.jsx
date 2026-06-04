@@ -5,6 +5,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -2739,7 +2740,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                       <button onClick={() => setDeleteId(g.id)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")}
                         onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
-                        <MoreVertIcon style={{ fontSize: 18 }} />
+                        <DeleteOutlineIcon style={{ fontSize: 18 }} />
                       </button>
                     </div>
                   </td>
