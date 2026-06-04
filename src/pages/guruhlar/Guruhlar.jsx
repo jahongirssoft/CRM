@@ -565,9 +565,14 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
           </div>
           <div style={{ marginLeft: 24 }}>
             <p style={{ margin: 0, fontSize: 11, color: "#9ca3af" }}>Holat</p>
-            <p style={{ margin: "2px 0 0", fontSize: 13, color: date.past ? "#9ca3af" : "#ef4444" }}>
-              {date.past ? "Dars o’tilmagan" : "Dars kelmagan"}
-            </p>
+            {(() => {
+              const isHeld = saved || mavzu.trim().length > 0 || Object.keys(attendance).some((k) => attendance[k]);
+              return (
+                <p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 600, color: isHeld ? "#16a34a" : (date.past ? "#9ca3af" : "#ef4444") }}>
+                  {isHeld ? "Dars o’tildi ✓" : (date.past ? "Dars o’tilmagan" : "Dars kelmagan")}
+                </p>
+              );
+            })()}
           </div>
         </div>
         );
