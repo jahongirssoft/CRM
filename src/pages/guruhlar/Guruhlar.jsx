@@ -1610,37 +1610,37 @@ function GroupDetail({ group: initialGroup, onBack }) {
                 </div>
                 <div style={{ padding: "20px" }}>
                   {/* Info */}
-                  <div style={{ background: "#eff6ff", borderRadius: 10, padding: "12px 16px", fontSize: 13, color: "#1d4ed8", marginBottom: 24, display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ</span>
-                    <span>60–100 oralig&apos;ida ball — <b>Qabul qilindi</b>, 0–59 oralig&apos;ida — <b>Qaytarildi</b></span>
+                  <div style={{ background: "#eff6ff", borderRadius: 12, padding: "14px 16px", fontSize: 13, color: "#1d4ed8", marginBottom: 24, display: "flex", gap: 10, alignItems: "flex-start", lineHeight: 1.5 }}>
+                    <span style={{ fontSize: 18, flexShrink: 0 }}>ⓘ</span>
+                    <span>60-100 oralig&apos;ida ball qo&apos;yilgan vazifa <b>&apos;Qabul qilingan&apos;</b>, 0-59 oralig&apos;ida ball qo&apos;yilgan vazifa <b>&apos;Qaytarilgan&apos;</b> hisoblanadi.</span>
                   </div>
 
-                  {/* Score */}
+                  {/* Ball */}
                   <div style={{ marginBottom: 24 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text,#111)" }}>Ball</span>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 28, fontWeight: 800, color: hwStudentView.score >= 60 ? "#16a34a" : "#ef4444" }}>{hwStudentView.score}</span>
-                        <span style={{ fontSize: 14, color: "#9ca3af" }}>/100</span>
-                      </div>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text,#111)", margin: "0 0 16px" }}>Ball</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <input type="range" min={0} max={100} value={hwStudentView.score}
+                        onChange={(e) => setHwStudentView((p) => ({ ...p, score: Number(e.target.value) }))}
+                        style={{ flex: 1, accentColor: "#16a34a", height: 6, cursor: "pointer" }} />
+                      <input type="number" min={0} max={100} value={hwStudentView.score}
+                        onChange={(e) => setHwStudentView((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
+                        style={{ width: 72, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg,#fff)", color: "var(--text,#111)" }} />
                     </div>
-                    <input type="range" min={0} max={100} value={hwStudentView.score}
-                      onChange={(e) => setHwStudentView((p) => ({ ...p, score: Number(e.target.value) }))}
-                      style={{ width: "100%", accentColor: hwStudentView.score >= 60 ? "#16a34a" : "#ef4444", height: 6, cursor: "pointer" }} />
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                      <span style={{ fontSize: 11, color: "#ef4444" }}>Qaytariladi (0–59)</span>
-                      <span style={{ fontSize: 11, color: "#16a34a" }}>Qabul qilinadi (60–100)</span>
-                    </div>
+                    <p style={{ margin: "10px 0 0", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali</p>
                   </div>
 
                   {/* Comment */}
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text,#374151)", display: "block", marginBottom: 8 }}>Izoh (ixtiyoriy)</label>
-                    <textarea placeholder="Talabaga izoh qoldiring..." value={hwStudentView.comment}
-                      onChange={(e) => setHwStudentView((p) => ({ ...p, comment: e.target.value }))}
-                      rows={3} style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", fontFamily: "inherit", background: "var(--input-bg,#fff)", color: "var(--text,#111)" }}
-                      onFocus={(e) => (e.target.style.border = "1.5px solid #16a34a")}
-                      onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
+                    <div style={{ position: "relative" }}>
+                      <textarea placeholder="Izohingiz..." value={hwStudentView.comment}
+                        onChange={(e) => setHwStudentView((p) => ({ ...p, comment: e.target.value }))}
+                        rows={4} style={{ width: "100%", padding: "14px 48px 14px 14px", border: "1.5px solid #e5e7eb", borderRadius: 12, fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", fontFamily: "inherit", color: "var(--text,#374151)", background: "var(--input-bg,#fff)", lineHeight: 1.6 }}
+                        onFocus={(e) => (e.target.style.border = "1.5px solid #16a34a")}
+                        onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
+                      <button style={{ position: "absolute", right: 10, bottom: 10, width: 32, height: 32, borderRadius: "50%", background: "#16a34a", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V6zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                      </button>
+                    </div>
                   </div>
 
                   {hwStudentView.saveError && (
@@ -2187,38 +2187,44 @@ function GroupDetail({ group: initialGroup, onBack }) {
 
             <div style={{ padding: "20px 24px" }}>
               {/* Info banner */}
-              <div style={{ background: "#eff6ff", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#1d4ed8", marginBottom: 16 }}>
-                60–100 oralig&apos;ida ball qo&apos;yilgan vazifa &apos;Qabul qilingan&apos;, 0–59 oralig&apos;ida &apos;Qaytarilgan&apos; hisoblanadi.
+              <div style={{ background: "#eff6ff", borderRadius: 12, padding: "14px 16px", fontSize: 13, color: "#1d4ed8", marginBottom: 24, display: "flex", gap: 10, alignItems: "flex-start", lineHeight: 1.5 }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>ⓘ</span>
+                <span>60-100 oralig&apos;ida ball qo&apos;yilgan vazifa <b>&apos;Qabul qilingan&apos;</b>, 0-59 oralig&apos;ida ball qo&apos;yilgan vazifa <b>&apos;Qaytarilgan&apos;</b> hisoblanadi.</span>
               </div>
 
               {/* Ball */}
-              <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text, #111)", margin: "0 0 10px" }}>Ball</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text, #111)", margin: "0 0 16px" }}>Ball</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                   <input type="range" min={0} max={100} value={gradeModal.score}
                     onChange={(e) => setGradeModal((p) => ({ ...p, score: Number(e.target.value) }))}
-                    style={{ flex: 1, accentColor: PRIMARY }} />
+                    style={{ flex: 1, accentColor: "#16a34a", height: 6, cursor: "pointer" }} />
                   <input type="number" min={0} max={100} value={gradeModal.score}
                     onChange={(e) => setGradeModal((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
-                    style={{ width: 60, padding: "6px 10px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                    style={{ width: 72, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg, #fff)", color: "var(--text, #111)" }} />
                 </div>
-                <p style={{ margin: "6px 0 0", fontSize: 11, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali: 60</p>
+                <p style={{ margin: "10px 0 0", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali</p>
               </div>
 
               {/* Comment */}
               <div style={{ marginBottom: 20 }}>
-                <textarea placeholder="Izohingiz..." value={gradeModal.comment}
-                  onChange={(e) => setGradeModal((p) => ({ ...p, comment: e.target.value }))}
-                  rows={3} style={{ width: "100%", padding: "10px 12px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit", color: "#374151" }}
-                  onFocus={(e) => (e.target.style.border = `1.5px solid ${PRIMARY}`)}
-                  onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
+                <div style={{ position: "relative" }}>
+                  <textarea placeholder="Izohingiz..." value={gradeModal.comment}
+                    onChange={(e) => setGradeModal((p) => ({ ...p, comment: e.target.value }))}
+                    rows={4} style={{ width: "100%", padding: "14px 48px 14px 14px", border: "1.5px solid #e5e7eb", borderRadius: 12, fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", fontFamily: "inherit", color: "var(--text, #374151)", background: "var(--input-bg, #fff)", lineHeight: 1.6 }}
+                    onFocus={(e) => (e.target.style.border = "1.5px solid #16a34a")}
+                    onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
+                  <button style={{ position: "absolute", right: 10, bottom: 10, width: 32, height: 32, borderRadius: "50%", background: "#16a34a", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V6zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                  </button>
+                </div>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-                <button onClick={() => setGradeModal(null)} style={{ padding: "9px 24px", border: "1.5px solid #e5e7eb", borderRadius: 8, background: "var(--card, #fff)", fontSize: 13, cursor: "pointer", color: "var(--text, #374151)", fontWeight: 500 }}>Bekor qilish</button>
+              <div style={{ display: "flex", gap: 12 }}>
+                <button onClick={() => setGradeModal(null)} style={{ flex: 1, padding: "12px", border: "1.5px solid #e5e7eb", borderRadius: 10, background: "var(--card, #fff)", fontSize: 14, cursor: "pointer", color: "var(--text, #374151)", fontWeight: 600 }}>Bekor qilish</button>
                 <button onClick={handleGrade} disabled={gradeModal.saving}
-                  style={{ padding: "9px 24px", border: "none", borderRadius: 8, background: gradeModal.saving ? "#a78bfa" : "#16a34a", color: "#fff", fontSize: 13, fontWeight: 600, cursor: gradeModal.saving ? "not-allowed" : "pointer", boxShadow: "0 3px 10px rgba(22,163,74,0.3)" }}>
-                  {gradeModal.saving ? "Yuborilmoqda..." : "Yuborish"}
+                  style={{ flex: 2, padding: "12px", border: "none", borderRadius: 10, background: gradeModal.saving ? "#86efac" : "#16a34a", color: "#fff", fontSize: 14, fontWeight: 700, cursor: gradeModal.saving ? "not-allowed" : "pointer", boxShadow: "0 4px 14px rgba(22,163,74,.3)" }}>
+                  {gradeModal.saving ? "Yuklanmoqda..." : "Yuborish"}
                 </button>
               </div>
             </div>
