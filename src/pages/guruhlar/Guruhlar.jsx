@@ -5,7 +5,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
