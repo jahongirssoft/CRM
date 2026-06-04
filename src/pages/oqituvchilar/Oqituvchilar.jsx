@@ -21,7 +21,14 @@ import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const PRIMARY = "#7c3aed";
-const TOTAL_PAGES = 10;
+const PER_PAGE = 10;
+
+const buildPages = (current, total) => {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, "...", total];
+  if (current >= total - 3) return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
+  return [1, "...", current - 1, current, current + 1, "...", total];
+};
 
 const LABEL_SETS = [
   ["Label", "Label", "Label", "+4"],
@@ -255,12 +262,14 @@ export default function Oqituvchilar() {
   const toggleAll  = () => setSelected(allChecked ? new Set() : new Set(allIds));
   const toggleRow  = (id) => setSelected((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
-  const filtered = teachers.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered   = teachers.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const safePage   = Math.min(page, totalPages);
+  const paginated  = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const pages      = buildPages(safePage, totalPages);
 
   const col = { fontSize: 12, color: "var(--text-muted, #9ca3af)", fontWeight: 500, padding: "10px 12px", textAlign: "left", whiteSpace: "nowrap" };
   const cell = { fontSize: 13, color: "var(--text, #374151)", padding: "13px 12px", verticalAlign: "middle" };
-
-  const pages = [1, 2, 3, "...", 8, 9, 10];
 
   return (
     <div className="page-content">
@@ -349,7 +358,7 @@ export default function Oqituvchilar() {
               {loading && (
                 <tr><td colSpan={8} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</td></tr>
               )}
-              {!loading && filtered.map((t) => {
+              {!loading && paginated.map((t) => {
                 const isSelected = selected.has(t.id);
                 return (
                   <tr
@@ -428,40 +437,26 @@ export default function Oqituvchilar() {
         </div>
 
         {/* Pagination */}
+        {totalPages > 1 && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderTop: "1px solid #f5f5f5", flexWrap: "wrap", gap: 10 }}>
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            style={{ display: "flex", alignItems: "center", gap: 6, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: "pointer", color: "var(--text, #374151)" }}
-          >
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage === 1}
+            style={{ display: "flex", alignItems: "center", gap: 6, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: safePage === 1 ? "not-allowed" : "pointer", color: safePage === 1 ? "#d1d5db" : "var(--text, #374151)" }}>
             <ChevronLeftIcon style={{ fontSize: 16 }} /> Previous
           </button>
-
           <div style={{ display: "flex", gap: 4 }}>
             {pages.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => typeof p === "number" && setPage(p)}
-                style={{
-                  width: 36, height: 36, borderRadius: 8, border: "none",
-                  background: page === p ? PRIMARY : "transparent",
-                  color: page === p ? "#fff" : p === "..." ? "#9ca3af" : "#374151",
-                  fontSize: 13, fontWeight: page === p ? 600 : 400,
-                  cursor: typeof p === "number" ? "pointer" : "default",
-                  transition: "all 0.15s",
-                }}
-              >
+              <button key={i} onClick={() => typeof p === "number" && setPage(p)}
+                style={{ width: 36, height: 36, borderRadius: 8, border: "none", background: safePage === p ? PRIMARY : "transparent", color: safePage === p ? "#fff" : p === "..." ? "#9ca3af" : "#374151", fontSize: 13, fontWeight: safePage === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all 0.15s" }}>
                 {p}
               </button>
             ))}
           </div>
-
-          <button
-            onClick={() => setPage((p) => Math.min(TOTAL_PAGES, p + 1))}
-            style={{ display: "flex", alignItems: "center", gap: 6, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: "pointer", color: "var(--text, #374151)" }}
-          >
+          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}
+            style={{ display: "flex", alignItems: "center", gap: 6, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: safePage === totalPages ? "not-allowed" : "pointer", color: safePage === totalPages ? "#d1d5db" : "var(--text, #374151)" }}>
             Next <ChevronRightIcon style={{ fontSize: 16 }} />
           </button>
         </div>
+        )}
       </div>
 
       {/* ── DRAWER BACKDROP ── */}

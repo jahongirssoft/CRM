@@ -17,8 +17,14 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 
 const PRIMARY    = "#7c3aed";
-const TOTAL_PAGES = 10;
-const PAGES      = [1, 2, 3, "...", 8, 9, 10];
+const PER_PAGE = 10;
+
+const buildPages = (current, total) => {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, "...", total];
+  if (current >= total - 3) return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
+  return [1, "...", current - 1, current, current + 1, "...", total];
+};
 
 const AVATAR_COLORS = ["#7c3aed","#3b82f6","#f59e0b","#16a34a","#ef4444","#0891b2","#db2777"];
 
@@ -115,7 +121,11 @@ export default function Talabalar() {
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
-  const filtered = students.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered   = students.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const safePage   = Math.min(page, totalPages);
+  const paginated  = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const pages      = buildPages(safePage, totalPages);
 
   const openDrawer = () => { setForm({ phone: "+998", mail: "", fio: "", birthDate: "", address: "", password: "", groups: [], groupInput: "", photoFile: null, photoPreview: null }); setSaveError(""); setEditId(null); setDrawerOpen(true); };
   const openEdit   = (s) => {
@@ -318,7 +328,7 @@ export default function Talabalar() {
               {loading && (
                 <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</td></tr>
               )}
-              {!loading && filtered.map((s) => {
+              {!loading && paginated.map((s) => {
                 const isSel = selected.has(s.id);
                 const bg    = avatarBg(s.id);
                 return (
@@ -380,22 +390,26 @@ export default function Talabalar() {
         </div>
 
         {/* Pagination */}
+        {totalPages > 1 && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderTop: "1px solid #f5f5f5", flexWrap: "wrap", gap: 10 }}>
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} style={{ display: "flex", alignItems: "center", gap: 5, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: "pointer", color: "#374151" }}>
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage === 1}
+            style={{ display: "flex", alignItems: "center", gap: 5, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: safePage === 1 ? "not-allowed" : "pointer", color: safePage === 1 ? "#d1d5db" : "#374151" }}>
             <ChevronLeftIcon style={{ fontSize: 16 }} /> Previous
           </button>
           <div style={{ display: "flex", gap: 4 }}>
-            {PAGES.map((p, i) => (
+            {pages.map((p, i) => (
               <button key={i} onClick={() => typeof p === "number" && setPage(p)}
-                style={{ width: 34, height: 34, borderRadius: 8, border: "none", background: page === p ? PRIMARY : "transparent", color: page === p ? "#fff" : p === "..." ? "#9ca3af" : "#374151", fontSize: 13, fontWeight: page === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all .15s" }}>
+                style={{ width: 34, height: 34, borderRadius: 8, border: "none", background: safePage === p ? PRIMARY : "transparent", color: safePage === p ? "#fff" : p === "..." ? "#9ca3af" : "#374151", fontSize: 13, fontWeight: safePage === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all .15s" }}>
                 {p}
               </button>
             ))}
           </div>
-          <button onClick={() => setPage((p) => Math.min(TOTAL_PAGES, p + 1))} style={{ display: "flex", alignItems: "center", gap: 5, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: "pointer", color: "#374151" }}>
+          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}
+            style={{ display: "flex", alignItems: "center", gap: 5, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: safePage === totalPages ? "not-allowed" : "pointer", color: safePage === totalPages ? "#d1d5db" : "#374151" }}>
             Next <ChevronRightIcon style={{ fontSize: 16 }} />
           </button>
         </div>
+        )}
       </div>
 
       {/* ══ GURUH MODAL ══ */}
