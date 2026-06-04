@@ -2333,7 +2333,7 @@ const mapGroup = (g) => ({
 });
 
 /* ════════════════════ MAIN ════════════════════ */
-export default function Guruhlar({ darkMode }) {
+export default function Guruhlar({ darkMode, onGroupSelect }) {
   const [groups, setGroups]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab]         = useState("guruhlar");
@@ -2346,12 +2346,14 @@ export default function Guruhlar({ darkMode }) {
   const [apiStudents, setApiStudents] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
-  // Refresh da saqlash: selectedGroup o'zgarganda sessionStorage ga yoz
+  // Refresh da saqlash + URL yangilash
   useEffect(() => {
     if (selectedGroup) {
       sessionStorage.setItem("guruhlar_selected_id", String(selectedGroup.id));
+      onGroupSelect?.(selectedGroup.id);
     } else {
       sessionStorage.removeItem("guruhlar_selected_id");
+      onGroupSelect?.(null);
     }
   }, [selectedGroup]);
   const [deleteId, setDeleteId] = useState(null);

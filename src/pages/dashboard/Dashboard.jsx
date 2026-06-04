@@ -70,7 +70,14 @@ const STAT_DEFS = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { page: urlPage } = useParams();
+  const { page: urlPage, id: urlId } = useParams();
+
+  // URL da guruh ID bo'lsa, sessionStorage ga yoz (refresh uchun)
+  useEffect(() => {
+    if (urlPage === "guruhlar" && urlId) {
+      sessionStorage.setItem("guruhlar_selected_id", urlId);
+    }
+  }, [urlPage, urlId]);
 
   // URL → activePage mapping
   const urlToPage = (p) => {
@@ -756,7 +763,13 @@ const sidebarW = collapsed ? 64 : 230;
           ) : activePage === "talabalar" ? (
             <Talabalar darkMode={darkMode} />
           ) : activePage === "guruhlar" ? (
-            <Guruhlar darkMode={darkMode} />
+            <Guruhlar darkMode={darkMode}
+              onGroupSelect={(id) => {
+                const newPath = id ? `/dashboard/guruhlar/${id}` : "/dashboard/guruhlar";
+                if (window.location.pathname !== newPath)
+                  window.history.replaceState(null, "", newPath);
+              }}
+            />
           ) : (
             <div style={{ padding: "28px 24px" }}>
               {/* Welcome */}
