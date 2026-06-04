@@ -419,11 +419,33 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
     const mm = MONTH_NUM[date.month] ?? "01";
     const dd = String(date.day).padStart(2, "0");
     const dateStr = `2026-${mm}-${dd}`;
+
+    // Mavzu va tavsifni yuklash
     api.get(`/groups/${group.id}/lesson`, { params: { date: dateStr } })
       .then((res) => {
         const d = res.data?.data ?? res.data;
         if (d?.topic) setMavzu(d.topic);
         if (d?.description) setTavsif(d.description);
+      })
+      .catch(() => {});
+
+    // Avvalgi davomat ma'lumotlarini yuklash
+    api.get("/attendance/all")
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        if (!Array.isArray(data)) return;
+        // Shu guruh va shu sanaga tegishli yozuvlarni topish
+        const map = {};
+        data
+          .filter((a) =>
+            Number(a.group_id) === Number(group.id) &&
+            a.created_at?.startsWith(dateStr)
+          )
+          .forEach((a) => {
+            // Bir talaba uchun oxirgi yozuvni olish
+            map[a.student_id] = a.isPresent;
+          });
+        if (Object.keys(map).length > 0) setAttendance(map);
       })
       .catch(() => {});
   }, [group.id, date.day, date.month]);
