@@ -81,20 +81,47 @@ function GradeSlider({ value, onChange }) {
   const pct = value;
   const dots = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   return (
-    <div style={{ position: "relative", height: 28, display: "flex", alignItems: "center" }}>
-      {/* Track */}
-      <div style={{ position: "absolute", left: 0, right: 0, height: 8, borderRadius: 99, background: `linear-gradient(to right, #16a34a ${pct}%, #d1d5db ${pct}%)`, overflow: "hidden" }}>
-        {/* Dots overlay */}
+    <div style={{ position: "relative", height: 36, display: "flex", alignItems: "center" }}>
+      {/* Track container */}
+      <div style={{ position: "absolute", left: 0, right: 0, height: 10, borderRadius: 99, overflow: "visible" }}>
+        {/* Gray bg */}
+        <div style={{ position: "absolute", inset: 0, borderRadius: 99, background: "#d1d5db" }} />
+        {/* Green fill */}
+        <div style={{ position: "absolute", top: 0, left: 0, width: `${pct}%`, bottom: 0, borderRadius: 99, background: "linear-gradient(to right, #4ade80, #16a34a)" }} />
+        {/* Dots on both portions */}
         {dots.map((d) => (
-          <div key={d} style={{ position: "absolute", top: "50%", left: `${d}%`, transform: "translate(-50%,-50%)", width: 5, height: 5, borderRadius: "50%", background: "rgba(255,255,255,0.7)", pointerEvents: "none" }} />
+          <div key={d} style={{
+            position: "absolute", top: "50%", left: `${d}%`,
+            transform: "translate(-50%, -50%)",
+            width: 6, height: 6, borderRadius: "50%",
+            background: "rgba(255,255,255,0.85)",
+            pointerEvents: "none", zIndex: 1,
+          }} />
         ))}
       </div>
       {/* Thumb */}
-      <div style={{ position: "absolute", left: `${pct}%`, top: "50%", transform: "translate(-50%,-50%)", width: 22, height: 22, borderRadius: "50%", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,.2)", border: "2px solid #e5e7eb", zIndex: 2, pointerEvents: "none" }} />
+      <div style={{
+        position: "absolute",
+        left: `${pct}%`,
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: 24, height: 24,
+        borderRadius: "50%",
+        background: "#fff",
+        boxShadow: "0 2px 10px rgba(0,0,0,.18)",
+        border: "2px solid #e5e7eb",
+        zIndex: 2,
+        pointerEvents: "none",
+      }} />
       {/* Hidden native input */}
-      <input type="range" min={0} max={100} value={value}
+      <input
+        type="range" min={0} max={100} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ position: "absolute", inset: 0, width: "100%", opacity: 0, cursor: "pointer", zIndex: 3, margin: 0, height: "100%" }} />
+        style={{
+          position: "absolute", inset: 0, width: "100%", height: "100%",
+          opacity: 0, cursor: "pointer", zIndex: 3, margin: 0,
+        }}
+      />
     </div>
   );
 }
@@ -2224,7 +2251,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   </div>
                   <input type="number" min={0} max={100} value={gradeModal.score}
                     onChange={(e) => setGradeModal((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
-                    style={{ width: 72, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg, #fff)", color: "var(--text, #111)" }} />
+                    style={{ width: 76, padding: "10px 8px", border: "1.5px solid #e2e8f0", borderRadius: 12, fontSize: 20, fontWeight: 700, textAlign: "center", outline: "none", background: "#fff", color: "#111", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }} />
                 </div>
                 <p style={{ margin: "10px 0 0", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali</p>
               </div>
