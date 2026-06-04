@@ -860,17 +860,27 @@ function GroupDetail({ group: initialGroup, onBack }) {
   const submitHwGrade = async () => {
     if (!hwStudentView) return;
     const hwId = hwView?.hw?.homework?.[0]?.id ?? hwView?.hw?.id;
-    setHwStudentView((p) => ({ ...p, saving: true }));
+    // homework_answer_id — talabaning javob ID si (detail dan yoki fallback)
+    const answerId = hwStudentView.detail?.id
+      ?? hwStudentView.student?.answer_id
+      ?? hwStudentView.student?.homework_answer_id
+      ?? hwStudentView.student?.id;
+    setHwStudentView((p) => ({ ...p, saving: true, saveError: "" }));
     try {
       await api.post(`/group/${initialGroup.id}/homework/${hwId}/check`, {
         grade: hwStudentView.score,
         title: hwStudentView.comment || "Baholandi",
-        homework_answer_id: hwStudentView.student?.answer_id ?? hwStudentView.student?.homework_answer_id ?? hwStudentView.student?.id,
+        homework_answer_id: answerId,
       });
       setHwStudentView(null);
       fetchHwResults(hwView?.statusTab ?? "PENDING");
-    } catch {
-      setHwStudentView((p) => ({ ...p, saving: false }));
+    } catch (err) {
+      const msg = err?.response?.data?.message;
+      setHwStudentView((p) => ({
+        ...p,
+        saving: false,
+        saveError: Array.isArray(msg) ? msg.join(", ") : (msg ?? "Xatolik yuz berdi"),
+      }));
     }
   };
 
@@ -1599,6 +1609,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   onFocus={(e) => (e.target.style.border = "1.5px solid #16a34a")}
                   onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
 
+                {hwStudentView.saveError && (
+                  <p style={{ fontSize: 13, color: "#ef4444", margin: "0 0 10px", fontWeight: 500 }}>{hwStudentView.saveError}</p>
+                )}
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
                   <button onClick={() => setHwStudentView(null)}
                     style={{ padding: "10px 28px", border: "1.5px solid #e5e7eb", borderRadius: 8, background: "var(--card, #fff)", fontSize: 14, cursor: "pointer", color: "var(--text, #374151)", fontWeight: 500 }}>
