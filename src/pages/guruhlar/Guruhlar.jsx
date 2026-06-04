@@ -910,14 +910,22 @@ function GroupDetail({ group: initialGroup, onBack }) {
   const submitHwGrade = async () => {
     if (!hwStudentView) return;
     const hwId = hwView?.hw?.homework?.[0]?.id ?? hwView?.hw?.id;
-    // homework_answer_id faqat detail.id dan olinadi
-    const answerId = hwStudentView.detail?.id;
-    if (!answerId) {
-      setHwStudentView((p) => ({ ...p, saveError: "Talaba javobi ma'lumotlari yuklanmagan. Qayta urinib ko'ring." }));
-      return;
-    }
     setHwStudentView((p) => ({ ...p, saving: true, saveError: "" }));
+
     try {
+      // Detail yuklanmagan bo'lsa — qayta yuklash
+      let answerId = hwStudentView.detail?.id;
+      if (!answerId) {
+        const studentId = hwStudentView.student?.student_id ?? hwStudentView.student?.id;
+        const res = await api.get(`/group/${initialGroup.id}/homework/${hwId}/result/${studentId}`);
+        const d = res.data?.data;
+        answerId = d?.id;
+        if (d) setHwStudentView((p) => p ? ({ ...p, detail: d }) : null);
+      }
+      if (!answerId) {
+        setHwStudentView((p) => ({ ...p, saving: false, saveError: "Talaba javob topshirmagan" }));
+        return;
+      }
       await api.post(`/group/${initialGroup.id}/homework/${hwId}/check`, {
         grade: hwStudentView.score,
         title: hwStudentView.comment || "Baholandi",
@@ -1705,9 +1713,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
                       style={{ flex: 1, padding: "12px", border: "1.5px solid #e5e7eb", borderRadius: 10, background: "var(--card,#fff)", fontSize: 14, cursor: "pointer", color: "var(--text,#374151)", fontWeight: 600 }}>
                       Bekor qilish
                     </button>
-                    <button onClick={submitHwGrade} disabled={hwStudentView.saving}
-                      style={{ flex: 2, padding: "12px", border: "none", borderRadius: 10, background: hwStudentView.saving ? "#86efac" : "#16a34a", color: "#fff", fontSize: 14, fontWeight: 700, cursor: hwStudentView.saving ? "not-allowed" : "pointer", boxShadow: "0 4px 14px rgba(22,163,74,.35)" }}>
-                      {hwStudentView.saving ? "Yuklanmoqda..." : `✓ ${hwStudentView.score >= 60 ? "Qabul qilish" : "Qaytarish"} (${hwStudentView.score} ball)`}
+                    <button onClick={submitHwGrade} disabled={hwStudentView.saving || hwStudentView.loading}
+                      style={{ flex: 2, padding: "12px", border: "none", borderRadius: 10, background: (hwStudentView.saving || hwStudentView.loading) ? "#86efac" : "#16a34a", color: "#fff", fontSize: 14, fontWeight: 700, cursor: (hwStudentView.saving || hwStudentView.loading) ? "not-allowed" : "pointer", boxShadow: "0 4px 14px rgba(22,163,74,.35)" }}>
+                      {hwStudentView.loading ? "Ma'lumot yuklanmoqda..." : hwStudentView.saving ? "Yuborilmoqda..." : `✓ ${hwStudentView.score >= 60 ? "Qabul qilish" : "Qaytarish"} (${hwStudentView.score} ball)`}
                     </button>
                   </div>
                 </div>
