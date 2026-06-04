@@ -341,34 +341,33 @@ const sidebarW = collapsed ? 64 : 230;
                 onClick={() => { handleNavClick(label); setMobileOpen(false); }}
                 className={`nav-item ${isActive ? "nav-active" : ""}`}
                 style={{
-                  padding: collapsed ? "12px 0" : "12px 20px",
+                  padding: collapsed ? "11px 0" : "11px 16px",
                   justifyContent: collapsed ? "center" : "flex-start",
-                  backgroundColor: isActive ? PRIMARY_LIGHT : "transparent",
+                  margin: collapsed ? "2px 8px" : "2px 10px",
+                  borderRadius: 10,
+                  backgroundColor: isActive ? PRIMARY : "transparent",
                   color: isActive ? "#fff" : t.textSec,
                   fontWeight: isActive ? 600 : 400,
-                  borderLeft: isActive ? `3px solid #a78bfa` : "3px solid transparent",
-                  transition: "background 0.18s, color 0.18s, border-left 0.18s",
+                  fontSize: 13.5,
+                  transition: "all 0.15s ease",
+                  width: collapsed ? "auto" : "calc(100% - 20px)",
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = "#ede9fe";
+                    e.currentTarget.style.backgroundColor = darkMode ? "#334155" : "#f0eeff";
                     e.currentTarget.style.color = PRIMARY;
-                    e.currentTarget.style.borderLeft = `3px solid #c4b5fd`;
-                    e.currentTarget.style.fontWeight = "500";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.color = "#6b7280";
-                    e.currentTarget.style.borderLeft = "3px solid transparent";
-                    e.currentTarget.style.fontWeight = "400";
+                    e.currentTarget.style.color = t.textSec;
                   }
                 }}
               >
                 <Icon
                   style={{
-                    fontSize: 20,
+                    fontSize: 19,
                     color: isActive ? "#fff" : t.textMuted,
                     flexShrink: 0,
                   }}
@@ -536,14 +535,18 @@ const sidebarW = collapsed ? 64 : 230;
         <header
           style={{
             height: 64,
-            backgroundColor: t.bg,
-            borderBottom: "none",
+            backgroundColor: t.header,
+            borderBottom: `1px solid ${t.border}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             padding: "0 24px",
             gap: 12,
             flexShrink: 0,
+            position: "sticky",
+            top: 0,
+            zIndex: 50,
+            backdropFilter: "blur(8px)",
           }}
         >
           {/* Hamburger (mobile only) */}

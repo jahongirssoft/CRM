@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  --primary:       #7c3aed;
+  --primary-light: #ede9fe;
+  --primary-dark:  #6d28d9;
+  --success:       #16a34a;
+  --error:         #ef4444;
+  --warning:       #f59e0b;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --shadow-sm:     0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:     0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,.12);
+  --transition:    0.18s ease;
+}
+
+/* ═══════════════════════════════════════
+   GLOBAL RESET & BASE
+═══════════════════════════════════════ */
 * {
   margin: 0;
   padding: 0;
@@ -11,6 +33,23 @@ body {
   font-family: 'Inter', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f8f9fc;
+  color: #111;
+}
+
+/* Scrollbar global */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* Selection */
+::selection { background: #ede9fe; color: #6d28d9; }
+
+/* Focus ring */
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* ─── LOGIN ─────────────────────────────── */
@@ -97,11 +136,12 @@ body {
 
 /* ─── PAGE CONTENT ───────────────────────── */
 .page-content {
-  padding: 28px 24px;
-  font-family: 'Segoe UI', sans-serif;
+  padding: 28px 28px;
+  font-family: 'Inter', sans-serif;
+  min-height: calc(100vh - 64px);
 }
 @media (max-width: 640px) {
-  .page-content { padding: 16px 12px; }
+  .page-content { padding: 16px 14px; }
 }
 
 /* ─── PAGE HEADER ────────────────────────── */
@@ -128,19 +168,20 @@ body {
 /* ─── STAT CARD ──────────────────────────── */
 .stat-card {
   background: var(--card, #ffffff);
-  border-radius: 14px;
-  padding: 20px 16px;
+  border-radius: 16px;
+  padding: 22px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: box-shadow 0.18s, transform 0.18s, background 0.2s;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,.04);
+  transition: box-shadow var(--transition), transform var(--transition), background 0.2s;
   cursor: default;
 }
 .stat-card:hover {
-  box-shadow: 0 6px 20px rgba(124,58,237,0.13);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124,58,237,.14);
+  transform: translateY(-3px);
 }
 
 /* ─── GURUH STAT CARDS ───────────────────── */
@@ -183,14 +224,62 @@ body {
   position: fixed;
   top: 0;
   bottom: 0;
-  background: #fff;
+  background: var(--card, #fff);
   z-index: 300;
   display: flex;
   flex-direction: column;
-  transition: right 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  transition: right 0.28s cubic-bezier(0.34,1.1,0.64,1);
+  box-shadow: -8px 0 40px rgba(0,0,0,.12);
 }
 @media (max-width: 540px) {
   .side-drawer { width: 100vw !important; }
+}
+
+/* ─── PROFESSIONAL TABLE ─────────────────── */
+table { border-collapse: collapse; width: 100%; }
+thead th {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: #9ca3af;
+  padding: 11px 14px;
+  text-align: left;
+  white-space: nowrap;
+  background: #fafafa;
+  border-bottom: 1.5px solid #f0f0f0;
+}
+tbody td { border-bottom: 1px solid #f5f5f5; }
+tbody tr:last-child td { border-bottom: none; }
+
+/* ─── BETTER INPUT FOCUS ─────────────────── */
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,.10) !important;
+}
+
+/* ─── PAGE TITLE ─────────────────────────── */
+.page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text, #111);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-muted, #9ca3af);
+  max-width: 600px;
+  line-height: 1.6;
+  margin-bottom: 20px;
 }
 
 /* ─── TABLE WRAPPER ──────────────────────── */
