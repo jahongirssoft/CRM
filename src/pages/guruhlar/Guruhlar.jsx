@@ -1513,61 +1513,76 @@ function GroupDetail({ group: initialGroup, onBack }) {
                 <span style={{ color: "#9ca3af" }}>Uyga vazifa</span>
               </div>
 
-              {/* Uy vazifasi card */}
-              <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", padding: "18px 20px", marginBottom: 16 }}>
-                <p style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 700, color: "var(--text, #111)" }}>Uy vazifasi</p>
-                <p style={{ margin: "0 0 4px", fontSize: 12, color: "#9ca3af" }}>Izoh:</p>
-                <p style={{ margin: 0, fontSize: 14, color: "var(--text, #374151)" }}>
-                  {hwStudentView.detail?.description ?? hwView.hw?.description ?? hwView.hw?.topic ?? "—"}
-                </p>
+              {/* === UY VAZIFASI TOPSHIRIG'I === */}
+              <div style={{ background: "var(--card,#fff)", borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,.07)", overflow: "hidden", marginBottom: 16 }}>
+                <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border,#f0f0f0)", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: PRIMARY }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text,#111)", letterSpacing: ".1px" }}>Uy vazifasi topshirig&apos;i</span>
+                </div>
+                <div style={{ padding: "16px 20px" }}>
+                  <p style={{ margin: 0, fontSize: 14, color: "var(--text,#374151)", lineHeight: 1.6 }}>
+                    {hwStudentView.detail?.description ?? hwView.hw?.description ?? hwView.hw?.topic ?? "—"}
+                  </p>
+                </div>
               </div>
 
-              {/* Student submission card */}
-              <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", padding: "18px 20px", marginBottom: 16 }}>
-                <p style={{ margin: "0 0 14px", fontSize: 18, fontWeight: 700, color: "var(--text, #111)" }}>
-                  {hwStudentView.student?.fullName ?? hwStudentView.student?.full_name ?? hwStudentView.student?.name ?? "Talaba"}
-                </p>
+              {/* === TALABA JAVOBI === */}
+              <div style={{ background: "var(--card,#fff)", borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,.07)", overflow: "hidden", marginBottom: 16 }}>
+                {/* Header */}
+                <div style={{ padding: "16px 20px", background: `linear-gradient(135deg,${PRIMARY}22,#a855f722)`, borderBottom: "1px solid var(--border,#f0f0f0)", display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${PRIMARY},#a855f7)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 18, fontWeight: 700, flexShrink: 0 }}>
+                    {(hwStudentView.student?.fullName ?? hwStudentView.student?.full_name ?? hwStudentView.student?.name ?? "T")[0]?.toUpperCase()}
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--text,#111)" }}>
+                      {hwStudentView.student?.fullName ?? hwStudentView.student?.full_name ?? hwStudentView.student?.name ?? "Talaba"}
+                    </p>
+                    <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9ca3af" }}>Talaba javobi</p>
+                  </div>
+                  <div style={{ marginLeft: "auto" }}>
+                    {(() => {
+                      const st = hwStudentView.student?.status ?? "PENDING";
+                      const cfg = st === "ACCEPTED" ? { c: "#16a34a", bg: "#dcfce7", label: "Qabul qilindi" }
+                        : st === "REJECTED" ? { c: "#ef4444", bg: "#fee2e2", label: "Qaytarildi" }
+                        : { c: "#f59e0b", bg: "#fef3c7", label: "Kutayabti" };
+                      return <span style={{ fontSize: 12, fontWeight: 700, color: cfg.c, background: cfg.bg, padding: "4px 12px", borderRadius: 20 }}>{cfg.label}</span>;
+                    })()}
+                  </div>
+                </div>
 
-                {/* Info row */}
-                <div style={{ background: "var(--hover-bg, #f9fafb)", borderRadius: 10, padding: "14px 16px", marginBottom: 14, display: "flex", gap: 32, flexWrap: "wrap" }}>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>Vaqti:</p>
-                    <p style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 700, color: "var(--text, #111)" }}>
-                      {hwStudentView.student?.submitted_at ?? hwStudentView.student?.created_at
-                        ? new Date(hwStudentView.student.submitted_at ?? hwStudentView.student.created_at).toLocaleDateString("uz-UZ", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
-                        : "—"}
-                    </p>
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>Fayllar soni:</p>
-                    <p style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 700, color: "var(--text, #111)" }}>
-                      {hwStudentView.detail?.files?.length ?? hwStudentView.student?.file_count ?? 0}
-                    </p>
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>Status:</p>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#f59e0b", border: "1px solid #f59e0b", padding: "2px 10px", borderRadius: 20 }}>
-                      {hwStudentView.student?.status ?? "Kutayabti"}
-                    </span>
-                  </div>
+                {/* Meta info */}
+                <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border,#f5f5f5)", display: "flex", gap: 32, flexWrap: "wrap" }}>
+                  {[
+                    { label: "Topshirilgan vaqt", value: hwStudentView.student?.submitted_at ?? hwStudentView.student?.created_at
+                      ? new Date(hwStudentView.student.submitted_at ?? hwStudentView.student.created_at).toLocaleDateString("uz-UZ", { day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" })
+                      : "—" },
+                    { label: "Fayllar soni", value: hwStudentView.detail?.files?.length ?? hwStudentView.student?.file_count ?? 0 },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p style={{ margin: 0, fontSize: 11, color: "#9ca3af", fontWeight: 500, textTransform: "uppercase", letterSpacing: ".5px" }}>{label}</p>
+                      <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: "var(--text,#111)" }}>{value}</p>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Files */}
                 {hwStudentView.detail?.files?.length > 0 && (
-                  <div style={{ marginBottom: 14 }}>
-                    <p style={{ margin: "0 0 8px", fontSize: 13, color: "#6b7280" }}>Fayl: <strong>{hwStudentView.detail.files.length}</strong></p>
+                  <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border,#f5f5f5)" }}>
+                    <p style={{ margin: "0 0 10px", fontSize: 12, fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: ".5px" }}>Fayllar</p>
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                       {hwStudentView.detail.files.map((f, fi) => {
                         const isImg = /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(f.url ?? f.name ?? "");
-                        const fileUrl = f.url ?? f.path ?? "#";
+                        const url = f.url ?? f.path ?? "#";
                         return isImg ? (
-                          <a key={fi} href={fileUrl} target="_blank" rel="noreferrer">
-                            <img src={fileUrl} alt="" style={{ width: 120, height: 90, objectFit: "cover", borderRadius: 8, border: "1px solid #e5e7eb" }} />
+                          <a key={fi} href={url} target="_blank" rel="noreferrer">
+                            <img src={url} alt="" style={{ width: 100, height: 76, objectFit: "cover", borderRadius: 10, border: "1.5px solid #e5e7eb", transition: "transform .15s" }}
+                              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+                              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")} />
                           </a>
                         ) : (
-                          <a key={fi} href={fileUrl} target="_blank" rel="noreferrer"
-                            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: PRIMARY, padding: "6px 12px", border: "1px solid #e5e7eb", borderRadius: 8 }}>
-                            📎 {f.name ?? f.filename ?? `Fayl ${fi + 1}`}
+                          <a key={fi} href={url} target="_blank" rel="noreferrer"
+                            style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: PRIMARY, padding: "8px 14px", border: "1.5px solid #ede9fe", borderRadius: 10, background: "#faf5ff", textDecoration: "none", fontWeight: 500 }}>
+                            📎 {f.name ?? `Fayl ${fi + 1}`}
                           </a>
                         );
                       })}
@@ -1575,52 +1590,75 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   </div>
                 )}
 
-                {/* Answer */}
+                {/* Answer text */}
                 {(hwStudentView.detail?.answer ?? hwStudentView.student?.answer) && (
-                  <div style={{ padding: "12px 16px", background: "#f9fafb", borderLeft: "3px solid #7c3aed", borderRadius: "0 8px 8px 0" }}>
-                    <p style={{ margin: "0 0 4px", fontSize: 12, color: "#9ca3af" }}>Uyga vazifa izohi:</p>
-                    <p style={{ margin: 0, fontSize: 13, color: PRIMARY }}>{hwStudentView.detail?.answer ?? hwStudentView.student?.answer}</p>
+                  <div style={{ padding: "14px 20px" }}>
+                    <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: ".5px" }}>Javob matni</p>
+                    <div style={{ padding: "12px 16px", background: "var(--hover-bg,#f9fafb)", borderLeft: "3px solid #7c3aed", borderRadius: "0 10px 10px 0", fontSize: 14, color: "var(--text,#374151)", lineHeight: 1.6 }}>
+                      {hwStudentView.detail?.answer ?? hwStudentView.student?.answer}
+                    </div>
                   </div>
                 )}
-
-                {hwStudentView.loading && <p style={{ color: "#9ca3af", fontSize: 13, margin: "8px 0 0" }}>Yuklanmoqda...</p>}
+                {hwStudentView.loading && <div style={{ padding: "16px 20px", color: "#9ca3af", fontSize: 13 }}>Yuklanmoqda...</div>}
               </div>
 
-              {/* Grading section */}
-              <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", padding: "18px 20px" }}>
-                <div style={{ background: "#eff6ff", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#1d4ed8", marginBottom: 20 }}>
-                  ℹ 60–100 oralig&apos;ida ball qo&apos;yilgan vazifa &apos;Qabul qilingan&apos;, 0–59 oralig&apos;ida &apos;Qaytarilgan&apos; hisoblanadi.
+              {/* === BAHOLASH === */}
+              <div style={{ background: "var(--card,#fff)", borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,.07)", overflow: "hidden" }}>
+                <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border,#f0f0f0)", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text,#111)" }}>Baholash</span>
                 </div>
+                <div style={{ padding: "20px" }}>
+                  {/* Info */}
+                  <div style={{ background: "#eff6ff", borderRadius: 10, padding: "12px 16px", fontSize: 13, color: "#1d4ed8", marginBottom: 24, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ</span>
+                    <span>60–100 oralig&apos;ida ball — <b>Qabul qilindi</b>, 0–59 oralig&apos;ida — <b>Qaytarildi</b></span>
+                  </div>
 
-                <p style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: "var(--text, #111)" }}>Ball</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 6 }}>
-                  <input type="range" min={0} max={100} value={hwStudentView.score}
-                    onChange={(e) => setHwStudentView((p) => ({ ...p, score: Number(e.target.value) }))}
-                    style={{ flex: 1, accentColor: "#16a34a", height: 6 }} />
-                  <input type="number" min={0} max={100} value={hwStudentView.score}
-                    onChange={(e) => setHwStudentView((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
-                    style={{ width: 70, padding: "6px 10px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 15, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg, #fff)", color: "var(--text, #111)" }} />
-                </div>
-                <p style={{ margin: "0 0 20px", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali</p>
+                  {/* Score */}
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text,#111)" }}>Ball</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 28, fontWeight: 800, color: hwStudentView.score >= 60 ? "#16a34a" : "#ef4444" }}>{hwStudentView.score}</span>
+                        <span style={{ fontSize: 14, color: "#9ca3af" }}>/100</span>
+                      </div>
+                    </div>
+                    <input type="range" min={0} max={100} value={hwStudentView.score}
+                      onChange={(e) => setHwStudentView((p) => ({ ...p, score: Number(e.target.value) }))}
+                      style={{ width: "100%", accentColor: hwStudentView.score >= 60 ? "#16a34a" : "#ef4444", height: 6, cursor: "pointer" }} />
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                      <span style={{ fontSize: 11, color: "#ef4444" }}>Qaytariladi (0–59)</span>
+                      <span style={{ fontSize: 11, color: "#16a34a" }}>Qabul qilinadi (60–100)</span>
+                    </div>
+                  </div>
 
-                <textarea placeholder="Izohingiz..." value={hwStudentView.comment}
-                  onChange={(e) => setHwStudentView((p) => ({ ...p, comment: e.target.value }))}
-                  rows={3} style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", fontFamily: "inherit", background: "var(--input-bg, #fff)", color: "var(--text, #111)", marginBottom: 20 }}
-                  onFocus={(e) => (e.target.style.border = "1.5px solid #16a34a")}
-                  onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
+                  {/* Comment */}
+                  <div style={{ marginBottom: 20 }}>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text,#374151)", display: "block", marginBottom: 8 }}>Izoh (ixtiyoriy)</label>
+                    <textarea placeholder="Talabaga izoh qoldiring..." value={hwStudentView.comment}
+                      onChange={(e) => setHwStudentView((p) => ({ ...p, comment: e.target.value }))}
+                      rows={3} style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", fontFamily: "inherit", background: "var(--input-bg,#fff)", color: "var(--text,#111)" }}
+                      onFocus={(e) => (e.target.style.border = "1.5px solid #16a34a")}
+                      onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
+                  </div>
 
-                {hwStudentView.saveError && (
-                  <p style={{ fontSize: 13, color: "#ef4444", margin: "0 0 10px", fontWeight: 500 }}>{hwStudentView.saveError}</p>
-                )}
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-                  <button onClick={() => setHwStudentView(null)}
-                    style={{ padding: "10px 28px", border: "1.5px solid #e5e7eb", borderRadius: 8, background: "var(--card, #fff)", fontSize: 14, cursor: "pointer", color: "var(--text, #374151)", fontWeight: 500 }}>
-                    Bekor qilish
-                  </button>
-                  <button onClick={submitHwGrade} disabled={hwStudentView.saving}
-                    style={{ padding: "10px 28px", border: "none", borderRadius: 8, background: hwStudentView.saving ? "#6ee7b7" : "#16a34a", color: "#fff", fontSize: 14, fontWeight: 700, cursor: hwStudentView.saving ? "not-allowed" : "pointer", boxShadow: "0 3px 10px rgba(22,163,74,0.3)" }}>
-                    {hwStudentView.saving ? "Yuborilmoqda..." : "Yuborish"}
-                  </button>
+                  {hwStudentView.saveError && (
+                    <div style={{ background: "#fee2e2", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#dc2626", marginBottom: 14, fontWeight: 500 }}>
+                      ⚠ {hwStudentView.saveError}
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <button onClick={() => setHwStudentView(null)}
+                      style={{ flex: 1, padding: "12px", border: "1.5px solid #e5e7eb", borderRadius: 10, background: "var(--card,#fff)", fontSize: 14, cursor: "pointer", color: "var(--text,#374151)", fontWeight: 600 }}>
+                      Bekor qilish
+                    </button>
+                    <button onClick={submitHwGrade} disabled={hwStudentView.saving}
+                      style={{ flex: 2, padding: "12px", border: "none", borderRadius: 10, background: hwStudentView.saving ? "#86efac" : "#16a34a", color: "#fff", fontSize: 14, fontWeight: 700, cursor: hwStudentView.saving ? "not-allowed" : "pointer", boxShadow: "0 4px 14px rgba(22,163,74,.35)" }}>
+                      {hwStudentView.saving ? "Yuklanmoqda..." : `✓ ${hwStudentView.score >= 60 ? "Qabul qilish" : "Qaytarish"} (${hwStudentView.score} ball)`}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
