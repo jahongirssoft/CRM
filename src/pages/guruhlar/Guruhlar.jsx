@@ -898,23 +898,24 @@ function GroupDetail({ group: initialGroup, onBack }) {
   const openHwStudentView = (student) => {
     const hwId = hwView?.hw?.homework?.[0]?.id ?? hwView?.hw?.id;
     const studentId = student.student_id ?? student.id;
-    setHwStudentView({ student, hw: hwView?.hw, detail: null, loading: true, score: student.grade ?? 0, comment: "", saving: false });
+    setHwStudentView({ student, hw: hwView?.hw, detail: null, loading: true, score: student.grade ?? 0, comment: "", saving: false, saveError: "" });
     api.get(`/group/${initialGroup.id}/homework/${hwId}/result/${studentId}`)
       .then((res) => {
         const d = res.data?.data;
-        setHwStudentView((p) => p ? ({ ...p, detail: d, loading: false }) : null);
+        setHwStudentView((p) => p ? ({ ...p, detail: d ?? null, loading: false }) : null);
       })
-      .catch(() => setHwStudentView((p) => p ? ({ ...p, loading: false }) : null));
+      .catch(() => setHwStudentView((p) => p ? ({ ...p, loading: false, saveError: "Javob ma'lumotlarini yuklashda xatolik" }) : null));
   };
 
   const submitHwGrade = async () => {
     if (!hwStudentView) return;
     const hwId = hwView?.hw?.homework?.[0]?.id ?? hwView?.hw?.id;
-    // homework_answer_id — talabaning javob ID si (detail dan yoki fallback)
-    const answerId = hwStudentView.detail?.id
-      ?? hwStudentView.student?.answer_id
-      ?? hwStudentView.student?.homework_answer_id
-      ?? hwStudentView.student?.id;
+    // homework_answer_id faqat detail.id dan olinadi
+    const answerId = hwStudentView.detail?.id;
+    if (!answerId) {
+      setHwStudentView((p) => ({ ...p, saveError: "Talaba javobi ma'lumotlari yuklanmagan. Qayta urinib ko'ring." }));
+      return;
+    }
     setHwStudentView((p) => ({ ...p, saving: true, saveError: "" }));
     try {
       await api.post(`/group/${initialGroup.id}/homework/${hwId}/check`, {
