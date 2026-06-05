@@ -458,9 +458,11 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
   const [mavzu, setMavzu] = useState("");
   const [tavsif, setTavsif] = useState("");
   const [attendance, setAttendance] = useState({});
+  const [attendanceIds, setAttendanceIds] = useState({}); // student_id → attendance record id
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [existingLessonId, setExistingLessonId] = useState(null);
 
   const toggleAttend = (id) => setAttendance((p) => ({ ...p, [id]: !p[id] }));
 
@@ -471,30 +473,32 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
     const dd = String(date.day).padStart(2, "0");
     const dateStr = `2026-${mm}-${dd}`;
 
-    // Mavzu va tavsifni yuklash
+    // Mavzu va tavsifni yuklash — mavjud dars ID sini ham saqlash
     api.get(`/groups/${group.id}/lesson`, { params: { date: dateStr } })
       .then((res) => {
         const d = res.data?.data ?? res.data;
         if (d?.topic) setMavzu(d.topic);
         if (d?.description) setTavsif(d.description);
+        if (d?.id) setExistingLessonId(d.id);
       })
       .catch(() => {});
 
-    // Avvalgi davomat — shu guruhning eng so'nggi yozuvlarini olish
+    // Avvalgi davomat — shu guruhning yozuvlarini olish (id lar bilan)
     api.get("/attendance/all")
       .then((res) => {
         const data = res.data?.data ?? res.data;
         if (!Array.isArray(data)) return;
-        // Shu guruh uchun barcha yozuvlar, vaqt bo'yicha tartiblash
         const map = {};
+        const idMap = {};
         data
           .filter((a) => Number(a.group_id) === Number(group.id))
           .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
           .forEach((a) => {
-            // Har talaba uchun oxirgi yozuv ustunlik qiladi
             map[a.student_id] = a.isPresent;
+            if (a.id) idMap[a.student_id] = a.id; // attendance record id
           });
         if (Object.keys(map).length > 0) setAttendance(map);
+        if (Object.keys(idMap).length > 0) setAttendanceIds(idMap);
       })
       .catch(() => {});
   }, [group.id, date.day, date.month]);
@@ -503,29 +507,94 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
     if (!mavzu.trim()) { setSaveError("Mavzuni kiriting"); return; }
     setSaving(true);
     setSaveError("");
-    try {
-      // 1. Dars mavzusi saqlash
-      await api.post("/lessons", {
-        group_id: group.id,
-        topic: mavzu,
-        description: tavsif,
-      });
 
-      // 2. Davomat — barcha talabalar uchun (toggle qilinmagan = false)
+    const mm = MONTH_NUM[date.month] ?? "01";
+    const dd = String(date.day).padStart(2, "0");
+    const dateStr = `2026-${mm}-${dd}`;
+
+    try {
+      // 1. Dars mavzusi saqlash va lesson_id olish
+      let lessonId = existingLessonId;
+      if (!lessonId) {
+        try {
+          const lessonRes = await api.post("/lessons", {
+            group_id: group.id,
+            topic: mavzu,
+            description: tavsif,
+            date: dateStr,
+          });
+          const lessonData = lessonRes.data?.data ?? lessonRes.data;
+          lessonId = lessonData?.id;
+          if (lessonId) setExistingLessonId(lessonId);
+        } catch (lessonErr) {
+          const status = lessonErr?.response?.status;
+          // Agar dars allaqachon mavjud bo'lsa (409/400), mavjud darsni olish
+          if (status === 409 || status === 400) {
+            try {
+              const existing = await api.get(`/groups/${group.id}/lesson`, { params: { date: dateStr } });
+              const d = existing.data?.data ?? existing.data;
+              lessonId = d?.id;
+              if (lessonId) setExistingLessonId(lessonId);
+            } catch {
+              const msg = lessonErr?.response?.data?.message;
+              setSaveError(Array.isArray(msg) ? msg.join(", ") : (msg ?? "Dars saqlashda xatolik"));
+              setSaving(false);
+              return;
+            }
+          } else {
+            const msg = lessonErr?.response?.data?.message;
+            setSaveError(Array.isArray(msg) ? msg.join(", ") : (msg ?? "Dars saqlashda xatolik"));
+            setSaving(false);
+            return;
+          }
+        }
+      } else {
+        // Mavjud darsni yangilash
+        try {
+          await api.patch(`/lessons/${lessonId}`, { topic: mavzu, description: tavsif });
+        } catch { /* yangilanmasa ham davom etish */ }
+      }
+
+      // 2. Davomat — POST (yangi) yoki PATCH (mavjud yozuvni yangilash)
       if (students.length > 0) {
         const results = await Promise.allSettled(
-          students.map((s) =>
-            api.post("/attendance", {
+          students.map((s) => {
+            const existingId = attendanceIds[s.id];
+            const body = {
               group_id: group.id,
               student_id: s.id,
               isPresent: attendance[s.id] === true,
-            })
-          )
+              ...(lessonId ? { lesson_id: lessonId } : {}),
+            };
+            if (existingId) {
+              return api.patch(`/attendance/${existingId}`, { isPresent: attendance[s.id] === true });
+            }
+            return api.post("/attendance", body);
+          })
         );
+
+        // Muvaffaqiyatli PATCH/POST larning yangi ID larini saqlash
+        const newIds = { ...attendanceIds };
+        results.forEach((r, i) => {
+          if (r.status === "fulfilled") {
+            const d = r.value?.data?.data ?? r.value?.data;
+            if (d?.id) newIds[students[i].id] = d.id;
+          }
+        });
+        setAttendanceIds(newIds);
+
         const failed = results.filter((r) => r.status === "rejected");
-        if (failed.length === students.length) {
-          const msg = failed[0].reason?.response?.data?.message;
-          setSaveError(Array.isArray(msg) ? msg.join(", ") : "Davomat saqlashda xatolik");
+        if (failed.length > 0 && failed.length === students.length) {
+          const reason = failed[0].reason;
+          const resData = reason?.response?.data;
+          const status = reason?.response?.status;
+          const apiMsg = resData?.message ?? resData?.error;
+          // eslint-disable-next-line no-console
+          console.error("Attendance error:", { status, resData });
+          const errText = Array.isArray(apiMsg)
+            ? apiMsg.join(", ")
+            : (apiMsg ? `${apiMsg} (${status})` : `Davomat xatolik: ${status ?? "tarmoq xatosi"}`);
+          setSaveError(errText);
           setSaving(false);
           return;
         }
