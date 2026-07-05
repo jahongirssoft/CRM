@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axios";
+import { getCurrentUser, logout as authLogout, ROLES } from "../../api/auth";
+import PasswordChangeModal from "../../components/PasswordChangeModal";
 import { useNavigate, useParams } from "react-router-dom";
-import { Menu, MenuItem, Divider, ListItemIcon } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import LockResetIcon from "@mui/icons-material/LockReset";
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
 import LayersIcon from "@mui/icons-material/Layers";
@@ -25,7 +27,6 @@ import SchoolIcon from "@mui/icons-material/School";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import RedeemIcon from "@mui/icons-material/Redeem";
 import GroupIcon from "@mui/icons-material/Group";
-import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import CardMembershipIcon from "@mui/icons-material/CardMembership";
 import ReplayIcon from "@mui/icons-material/Replay";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -34,14 +35,21 @@ import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import BadgeIcon from "@mui/icons-material/Badge";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import WifiTetheringIcon from "@mui/icons-material/WifiTethering";
+import SettingsIcon from "@mui/icons-material/Settings";
 import Boshqarish from "../boshqarish/Boshqarish";
 import Oqituvchilar from "../oqituvchilar/Oqituvchilar";
 import Talabalar from "../talabalar/Talabalar";
 import Guruhlar  from "../guruhlar/Guruhlar";
+import Guruhlarim from "../guruhlar/Guruhlarim";
+import TeacherGuruhlar from "../teacher/TeacherGuruhlar";
 
 const PRIMARY = "#7c3aed";
 const PRIMARY_LIGHT = "#6d28d9";
-const PRIMARY_HOVER = "#6d28d9";
 
 const FLYOUT = [
   { label: "Kurslar",        icon: LibraryBooksIcon },
@@ -51,14 +59,36 @@ const FLYOUT = [
   { label: "Xabar yuborish", icon: ForwardToInboxIcon },
 ];
 
-const NAV = [
-  { label: "Asosiy", icon: HomeIcon },
-  { label: "O'qituvchilar", icon: PersonIcon },
-  { label: "Guruhlar", icon: LayersIcon },
-  { label: "Talabalar", icon: PeopleIcon },
-  { label: "Sovg'alar", icon: CardGiftcardIcon },
-  { label: "Boshqarish", icon: TuneIcon },
-];
+const getNavItems = (role) => {
+  const r = (role || "ADMIN").toUpperCase();
+  if (r === "STUDENT") {
+    return [
+      { label: "Bosh sahifa", icon: HomeIcon, page: "asosiy" },
+      { label: "To'lovlarim", icon: CreditCardIcon, page: "to'lovlarim" },
+      { label: "Guruhlarim", icon: LayersIcon, page: "guruhlarim" },
+      { label: "Ko'rsatkichlarim", icon: BarChartIcon, page: "ko'rsatkichlarim" },
+      { label: "Reyting", icon: EmojiEventsIcon, page: "reyting" },
+      { label: "Do'kon", icon: ShoppingCartIcon, page: "do'kon" },
+      { label: "Qo'shimcha darslar", icon: WifiTetheringIcon, page: "qo'shimcha_darslar" },
+      { label: "Sozlamalar", icon: SettingsIcon, page: "sozlamalar" },
+    ];
+  } else if (r === "TEACHER") {
+    return [
+      { label: "Guruhlar", icon: LayersIcon, page: "teacher-guruhlar" },
+      { label: "Yig'ilayotgan guruhlar", icon: GroupIcon, page: "teacher-collecting" },
+      { label: "Profil", icon: PersonIcon, page: "teacher-profil" },
+    ];
+  } else {
+    return [
+      { label: "Asosiy", icon: HomeIcon, page: "asosiy" },
+      { label: "O'qituvchilar", icon: PersonIcon, page: "o'qituvchilar" },
+      { label: "Guruhlar", icon: LayersIcon, page: "guruhlar" },
+      { label: "Talabalar", icon: PeopleIcon, page: "talabalar" },
+      { label: "Sovg'alar", icon: CardGiftcardIcon, page: "sovg'alar" },
+      { label: "Boshqarish", icon: TuneIcon, page: "boshqarish" },
+    ];
+  }
+};
 
 const STAT_DEFS = [
   { label: "Sinflar",       Icon: GroupIcon,    bg: "#f0f9ff", color: "#0284c7",  endpoint: "/groups/all",   key: "groups" },
@@ -82,21 +112,35 @@ export default function Dashboard() {
   // URL → activePage mapping (English URLs)
   const urlToPage = (p) => {
     const map = {
-      "teachers":   "o'qituvchilar",
-      "groups":     "guruhlar",
-      "students":   "talabalar",
-      "gifts":      "sovg'alar",
-      "management": "boshqarish",
+      "teachers":      "o'qituvchilar",
+      "groups":        "guruhlar",
+      "students":      "talabalar",
+      "gifts":         "sovg'alar",
+      "management":    "boshqarish",
+      "my-groups":     "guruhlarim",
+      "payments":      "to'lovlarim",
+      "indicators":    "ko'rsatkichlarim",
+      "ranking":       "reyting",
+      "shop":          "do'kon",
+      "extra-lessons": "qo'shimcha_darslar",
+      "settings":      "sozlamalar",
     };
     return map[p] ?? "asosiy";
   };
   const pageToUrl = (p) => {
     const map = {
-      "o'qituvchilar": "teachers",
-      "guruhlar":      "groups",
-      "talabalar":     "students",
-      "sovg'alar":     "gifts",
-      "boshqarish":    "management",
+      "o'qituvchilar":      "teachers",
+      "guruhlar":           "groups",
+      "talabalar":          "students",
+      "sovg'alar":          "gifts",
+      "boshqarish":         "management",
+      "guruhlarim":         "my-groups",
+      "to'lovlarim":        "payments",
+      "ko'rsatkichlarim":   "indicators",
+      "reyting":            "ranking",
+      "do'kon":             "shop",
+      "qo'shimcha_darslar": "extra-lessons",
+      "sozlamalar":         "settings",
     };
     return map[p] ?? "";
   };
@@ -105,10 +149,8 @@ export default function Dashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [jadvaliOpen, setJadvaliOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const menuOpen = Boolean(anchorEl);
-  const [profileMenuPos, setProfileMenuPos] = useState({ top: 0, right: 0 });
   const [profileOpen, setProfileOpen] = useState(false);
+  const [pwdModalOpen, setPwdModalOpen] = useState(false);
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [activePage, setActivePage] = useState(() => urlPage ? urlToPage(urlPage) : (localStorage.getItem("activePage_page") || "asosiy"));
   const [boshqarishTab, setBoshqarishTab] = useState(() => localStorage.getItem("activePage_btab") || "Kurslar");
@@ -123,16 +165,34 @@ export default function Dashboard() {
   }, [activePage]);
   const [statCounts, setStatCounts] = useState({ groups: 0, courses: 0, students: 0, gifts: 0, teachers: 0 });
 
-  const currentUser = (() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return null;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return { id: payload.id, email: payload.email, role: payload.role };
-    } catch { return null; }
-  })();
+  const currentUser = getCurrentUser();
+
+  const userRole = currentUser?.role || ROLES.ADMIN;
+  const isStudent = userRole === ROLES.STUDENT;
+  const navItems = getNavItems(userRole);
+
+  // Rolga qarab ruxsat etilgan sahifalar (nav menyudan olinadi)
+  const homeItem = navItems[0];
+  const allowedPages = navItems.map((i) => i.page);
+
+  // Rol o'zgarganda yoki ruxsatsiz sahifaga o'tishga urinilганda — bosh sahifaga qaytarish
+  useEffect(() => {
+    const validPage = allowedPages.includes(activePage);
+    const validLabel = navItems.some((i) => i.label === active);
+    if (!validPage || !validLabel) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActive(homeItem.label);
+      setActivePage(homeItem.page);
+      localStorage.setItem("activePage_nav", homeItem.label);
+      localStorage.setItem("activePage_page", homeItem.page);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePage, active, userRole]);
+
 
   useEffect(() => {
+    // Stat kartalar admin ma'lumotlari — student bu endpointlarga kira olmaydi (403).
+    if (isStudent) return;
     STAT_DEFS.forEach(({ endpoint, key }) => {
       if (!endpoint) return;
       api.get(endpoint)
@@ -143,7 +203,7 @@ export default function Dashboard() {
         })
         .catch(() => {});
     });
-  }, []);
+  }, [isStudent]);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("dm") === "1");
 
   useEffect(() => {
@@ -165,7 +225,7 @@ export default function Dashboard() {
       root.style.setProperty("--bg",         "#f6f7fb");
       root.style.setProperty("--border",     "#e5e7eb");
       root.style.setProperty("--text",       "#111111");
-      root.style.setProperty("--text-muted", "#9ca3af");
+      root.style.setProperty("--text-muted", "#6b7280");
       root.style.setProperty("--input-bg",   "#ffffff");
       root.style.setProperty("--sidebar",    "#ffffff");
       root.style.setProperty("--hover-bg",   "#fafafa");
@@ -182,42 +242,35 @@ export default function Dashboard() {
 
   const t = darkMode ? {
     bg: "#0f172a", sidebar: "#1e293b", header: "#1e293b",
-    card: "#1e293b", border: "#334155", text: "#f1f5f9",
-    textSec: "#94a3b8", textMuted: "#64748b", inputBg: "#0f172a",
+    card: "#1e293b", border: "#334155", text: "#f8fafc",
+    textSec: "#cbd5e1", textMuted: "#94a3b8", inputBg: "#0f172a",
     bellBg: "#0f172a", subCard: "linear-gradient(135deg,#1e293b,#2d3748)",
     subBorder: "#334155",
   } : {
     bg: "#f6f7fb", sidebar: "#ffffff", header: "#ffffff",
-    card: "#ffffff", border: "#f0f0f0", text: "#111111",
-    textSec: "#6b7280", textMuted: "#9ca3af", inputBg: "#ffffff",
+    card: "#ffffff", border: "#f0f0f0", text: "#0f172a",
+    textSec: "#475569", textMuted: "#94a3b8", inputBg: "#ffffff",
     bellBg: "#f6f7fb", subCard: "linear-gradient(135deg,#fff7ed,#fef3c7)",
     subBorder: "#fed7aa",
   };
 
-  const handleAvatarClick = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setProfileMenuPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
-    setProfileOpen((p) => !p);
-  };
-  const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = () => {
     setProfileOpen(false);
-    handleMenuClose();
-    localStorage.removeItem("token");
+    authLogout();
     navigate("/login");
   };
 
-  const handleNavClick = (label) => {
-    if (label === "Boshqarish") {
+  const handleNavClick = (item) => {
+    if (item.label === "Boshqarish") {
       setFlyoutOpen((prev) => !prev);
       setActive("Boshqarish");
       localStorage.setItem("activePage_nav", "Boshqarish");
     } else {
       setFlyoutOpen(false);
-      setActive(label);
-      setActivePage(label.toLowerCase());
-      localStorage.setItem("activePage_nav", label);
-      localStorage.setItem("activePage_page", label.toLowerCase());
+      setActive(item.label);
+      setActivePage(item.page);
+      localStorage.setItem("activePage_nav", item.label);
+      localStorage.setItem("activePage_page", item.page);
     }
   };
 
@@ -282,23 +335,23 @@ const sidebarW = collapsed ? 64 : 230;
             style={{
               width: 40,
               height: 40,
-              borderRadius: 14,
-              background: `linear-gradient(145deg, ${PRIMARY} 0%, #a855f7 100%)`,
+              borderRadius: 11,
+              background: `linear-gradient(145deg, #24406b 0%, #16294a 100%)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              boxShadow: `0 6px 16px rgba(124,58,237,0.40)`,
+              boxShadow: `0 4px 12px rgba(22,41,74,0.30)`,
               position: "relative",
               overflow: "hidden",
             }}
           >
             <div style={{
               position: "absolute", inset: 0,
-              background: "linear-gradient(145deg, rgba(255,255,255,0.18) 0%, transparent 60%)",
-              borderRadius: 14,
+              background: "linear-gradient(145deg, rgba(255,255,255,0.16) 0%, transparent 60%)",
+              borderRadius: 11,
             }} />
-            <AutoStoriesIcon style={{ color: "#fff", fontSize: 21, position: "relative" }} />
+            <span style={{ color: "#fff", fontSize: 22, fontWeight: 900, position: "relative", lineHeight: 1, fontFamily: "'Inter', sans-serif" }}>N</span>
           </div>
 
           {/* Text */}
@@ -307,23 +360,22 @@ const sidebarW = collapsed ? 64 : 230;
               <span
                 style={{
                   fontWeight: 800,
-                  fontSize: 16,
-                  background: `linear-gradient(135deg, ${PRIMARY} 30%, #a855f7 100%)`,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  fontSize: 19,
                   whiteSpace: "nowrap",
-                  letterSpacing: "-0.5px",
-                  lineHeight: 1.1,
+                  letterSpacing: "-0.6px",
+                  lineHeight: 1.05,
                 }}
               >
-                Najot Edu
+                <span style={{ color: darkMode ? "#e2e8f0" : "#16294a" }}>Najot</span>
+                <span style={{ color: "#16a394" }}>Edu</span>
               </span>
               <span style={{
                 fontSize: 10,
-                color: "#a78bfa",
+                color: darkMode ? "#94a3b8" : "#aeb4c0",
                 fontWeight: 600,
-                letterSpacing: "0.5px",
+                letterSpacing: "1px",
                 textTransform: "uppercase",
+                opacity: 0.85,
               }}>
                 LMS Platform
               </span>
@@ -333,12 +385,13 @@ const sidebarW = collapsed ? 64 : 230;
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: "12px 0" }}>
-          {NAV.map(({ label, icon: Icon }) => {
-            const isActive = active === label;
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = active === item.label;
             return (
               <button
-                key={label}
-                onClick={() => { handleNavClick(label); setMobileOpen(false); }}
+                key={item.label}
+                onClick={() => { handleNavClick(item); setMobileOpen(false); }}
                 className={`nav-item ${isActive ? "nav-active" : ""}`}
                 style={{
                   padding: collapsed ? "11px 0" : "11px 16px",
@@ -372,7 +425,7 @@ const sidebarW = collapsed ? 64 : 230;
                     flexShrink: 0,
                   }}
                 />
-                {!collapsed && label}
+                {!collapsed && item.label}
               </button>
             );
           })}
@@ -511,14 +564,14 @@ const sidebarW = collapsed ? 64 : 230;
               style={{
                 display: "flex", alignItems: "center", gap: 10,
                 width: "100%", padding: "11px 16px", border: "none",
-                background: isSelected ? PRIMARY_LIGHT : "transparent",
+                background: isSelected ? PRIMARY : "transparent",
                 color: isSelected ? "#fff" : t.textSec,
                 fontSize: 13.5, fontWeight: isSelected ? 600 : 400,
                 cursor: "pointer", textAlign: "left",
                 transition: "background 0.15s, color 0.15s",
                 borderRadius: 0,
               }}
-              onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.background = darkMode ? "#334155" : "#f5f3ff"; e.currentTarget.style.color = PRIMARY; } }}
+              onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.background = darkMode ? "#334155" : "#f0eeff"; e.currentTarget.style.color = PRIMARY; } }}
               onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = t.textSec; } }}
             >
               <Icon style={{ fontSize: 18, color: "inherit", flexShrink: 0 }} />
@@ -586,24 +639,26 @@ const sidebarW = collapsed ? 64 : 230;
             </button>
 
             {/* Qo'shish */}
-            <button style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              background: PRIMARY,
-              color: "#fff",
-              border: "none",
-              borderRadius: 8,
-              padding: "7px 14px",
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 3px 10px rgba(124,58,237,0.28)",
-            }}>
-              <AddIcon style={{ fontSize: 17 }} />
-              Qo&apos;shish
-              <KeyboardArrowDownIcon style={{ fontSize: 17, marginLeft: 2 }} />
-            </button>
+            {!isStudent && (
+              <button style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                background: PRIMARY,
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                padding: "7px 14px",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 3px 10px rgba(124,58,237,0.28)",
+              }}>
+                <AddIcon style={{ fontSize: 17 }} />
+                Qo&apos;shish
+                <KeyboardArrowDownIcon style={{ fontSize: 17, marginLeft: 2 }} />
+              </button>
+            )}
 
             {/* Search */}
             <div style={{
@@ -737,7 +792,7 @@ const sidebarW = collapsed ? 64 : 230;
                       <p style={{ fontSize: 14, fontWeight: 700, color: "#111", margin: 0 }}>
                         {currentUser?.email?.split("@")[0] ?? "Admin"}
                       </p>
-                      <p style={{ fontSize: 12, color: "#9ca3af", margin: "2px 0 0" }}>
+                      <p style={{ fontSize: 12, color: "#6b7280", margin: "2px 0 0" }}>
                         {currentUser?.email ?? ""}
                       </p>
                       <span style={{ fontSize: 11, fontWeight: 600, color: PRIMARY, background: "#ede9fe", padding: "2px 10px", borderRadius: 20, display: "inline-block", marginTop: 6 }}>
@@ -751,8 +806,17 @@ const sidebarW = collapsed ? 64 : 230;
                     style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", border: "none", background: "transparent", cursor: "pointer", fontSize: 14, color: "#374151", borderBottom: "1px solid #f5f5f5" }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f3ff")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
-                    <AccountCircleIcon style={{ fontSize: 18, color: "#9ca3af" }} />
+                    <AccountCircleIcon style={{ fontSize: 18, color: "#6b7280" }} />
                     Profil
+                  </button>
+
+                  {/* Parolni o'zgartirish */}
+                  <button onClick={() => { setProfileOpen(false); setPwdModalOpen(true); }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", border: "none", background: "transparent", cursor: "pointer", fontSize: 14, color: "#374151", borderBottom: "1px solid #f5f5f5" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f3ff")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                    <LockResetIcon style={{ fontSize: 18, color: "#6b7280" }} />
+                    Parolni o&apos;zgartirish
                   </button>
 
                   {/* Chiqish */}
@@ -771,7 +835,28 @@ const sidebarW = collapsed ? 64 : 230;
 
         {/* CONTENT */}
         <main style={{ flex: 1, overflowY: "auto" }}>
-          {activePage === "boshqarish" ? (
+          {activePage === "teacher-guruhlar" ? (
+            <TeacherGuruhlar darkMode={darkMode} collecting={false} />
+          ) : activePage === "teacher-collecting" ? (
+            <TeacherGuruhlar darkMode={darkMode} collecting={true} />
+          ) : activePage === "teacher-profil" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Profil</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>O&apos;qituvchi ma&apos;lumotlari.</p>
+              <div style={{ background: t.card, borderRadius: 12, padding: 24, border: `1px solid ${t.border}`, maxWidth: 450 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 12, color: t.textSec, display: "block", marginBottom: 6 }}>Email</label>
+                    <input type="text" value={currentUser?.email ?? ""} readOnly style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${t.border}`, borderRadius: 8, background: t.bg, color: t.text, fontSize: 13, outline: "none" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, color: t.textSec, display: "block", marginBottom: 6 }}>Rol</label>
+                    <input type="text" value={userRole} readOnly style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${t.border}`, borderRadius: 8, background: t.bg, color: t.text, fontSize: 13, outline: "none" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : activePage === "boshqarish" ? (
             <Boshqarish initialTab={boshqarishTab} key={boshqarishTab} darkMode={darkMode} />
           ) : activePage === "o'qituvchilar" ? (
             <Oqituvchilar darkMode={darkMode} />
@@ -785,11 +870,123 @@ const sidebarW = collapsed ? 64 : 230;
                   window.history.replaceState(null, "", newPath);
               }}
             />
+          ) : activePage === "guruhlarim" ? (
+            <Guruhlarim darkMode={darkMode} />
+          ) : activePage === "to'lovlarim" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Mening To'lovlarim</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>Sizning to'lovlar ro'yxatingiz va hisob-fakturalaringiz.</p>
+              <div style={{ background: t.card, borderRadius: 12, padding: 24, border: `1px solid ${t.border}`, boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2.5px solid ${t.border}`, textAlign: "left" }}>
+                      <th style={{ padding: 12, color: t.textSec, fontSize: 13 }}>Kurs Nomi</th>
+                      <th style={{ padding: 12, color: t.textSec, fontSize: 13 }}>To'lov Sanasi</th>
+                      <th style={{ padding: 12, color: t.textSec, fontSize: 13 }}>Summa</th>
+                      <th style={{ padding: 12, color: t.textSec, fontSize: 13 }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: `1px solid ${t.border}` }}>
+                      <td style={{ padding: 16, color: t.text, fontSize: 13.5, fontWeight: 600 }}>n105 Backend</td>
+                      <td style={{ padding: 16, color: t.textSec, fontSize: 13 }}>14 May, 2026</td>
+                      <td style={{ padding: 16, color: t.text, fontSize: 13.5, fontWeight: 700 }}>1,200,000 UZS</td>
+                      <td style={{ padding: 16 }}><span style={{ fontSize: 11, fontWeight: 700, color: "#16a34a", background: "#dcfce7", padding: "4px 10px", borderRadius: 20 }}>Muvaffaqiyatli</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : activePage === "ko'rsatkichlarim" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Mening Ko'rsatkichlarim</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>O'quv ko'rsatkichlaringiz va statistikangiz.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20 }}>
+                {[
+                  { label: "Davomat", value: "96.4%", desc: "O'zlashtirilgan darslar", color: "#16a34a", bg: "#f0fdf4" },
+                  { label: "O'rtacha Baho", value: "89 / 100", desc: "Vazifalar natijasi", color: "#7c3aed", bg: "#f5f3ff" },
+                  { label: "Coinlar", value: "450 🪙", desc: "Sizning tangalaringiz", color: "#e28525", bg: "#fff7ed" }
+                ].map((s) => (
+                  <div key={s.label} style={{ background: t.card, borderRadius: 12, padding: 20, border: `1px solid ${t.border}`, boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+                    <p style={{ fontSize: 13, color: t.textSec, margin: "0 0 8px" }}>{s.label}</p>
+                    <p style={{ fontSize: 24, fontWeight: 800, color: s.color, margin: "0 0 4px" }}>{s.value}</p>
+                    <p style={{ fontSize: 11, color: t.textSec, margin: 0 }}>{s.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : activePage === "reyting" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Guruh Reytingi</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>O'quvchilar reytingi (n105 guruhida).</p>
+              <div style={{ background: t.card, borderRadius: 12, padding: 24, border: `1px solid ${t.border}`, boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+                {[
+                  { rank: 1, name: "Ali Valiyev", points: "980 pts", me: false },
+                  { rank: 2, name: "Salim Qodirov", points: "910 pts", me: false },
+                  { rank: 3, name: "Siz (Talaba)", points: "850 pts", me: true },
+                  { rank: 4, name: "Bobur", points: "720 pts", me: false }
+                ].map((s) => (
+                  <div key={s.rank} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${t.border}`, background: s.me ? (darkMode ? "#1e293b" : "#fff7ed") : "transparent" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: s.rank <= 3 ? "#e28525" : t.textSec, width: 24 }}>#{s.rank}</span>
+                      <span style={{ fontSize: 13.5, fontWeight: s.me ? 700 : 500, color: t.text }}>{s.name}</span>
+                    </div>
+                    <span style={{ fontSize: 13.5, fontWeight: 700, color: PRIMARY }}>{s.points}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : activePage === "do'kon" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Najot Edu Do'koni</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>To'plagan coinlaringizga sovg'alar xarid qiling.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 20 }}>
+                {[
+                  { name: "Najot Edu Hoodie", price: "200 coins", color: "#7c3aed" },
+                  { name: "Termos", price: "120 coins", color: "#e28525" },
+                  { name: "Daftar va Ruchka", price: "40 coins", color: "#16a34a" }
+                ].map((s) => (
+                  <div key={s.name} style={{ background: t.card, borderRadius: 12, padding: 16, border: `1px solid ${t.border}`, boxShadow: "0 2px 10px rgba(0,0,0,0.04)", textAlign: "center" }}>
+                    <div style={{ height: 100, background: darkMode ? "#1e293b" : "#f3f4f6", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+                      <ShoppingCartIcon style={{ fontSize: 40, color: s.color }} />
+                    </div>
+                    <p style={{ fontSize: 13.5, fontWeight: 600, color: t.text, margin: "0 0 6px" }}>{s.name}</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: s.color, margin: "0 0 12px" }}>{s.price}</p>
+                    <button style={{ background: PRIMARY, color: "#fff", border: "none", borderRadius: 6, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Sotib olish</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : activePage === "qo'shimcha_darslar" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Qo'shimcha darslar</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>Qo'shimcha amaliyot darslari va seminarlar ro'yxati.</p>
+              <div style={{ background: t.card, borderRadius: 12, padding: 24, border: `1px solid ${t.border}`, boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+                <p style={{ fontSize: 14, color: t.textMuted, textAlign: "center", margin: 0 }}>Hozircha qo'shimcha darslar rejalashtirilmagan.</p>
+              </div>
+            </div>
+          ) : activePage === "sozlamalar" ? (
+            <div style={{ padding: "28px 24px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Sozlamalar</h1>
+              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>Profil ma'lumotlari va sozlamalaringiz.</p>
+              <div style={{ background: t.card, borderRadius: 12, padding: 24, border: `1px solid ${t.border}`, boxShadow: "0 2px 10px rgba(0,0,0,0.04)", maxWidth: 450 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 12, color: t.textSec, display: "block", marginBottom: 6 }}>Email</label>
+                    <input type="text" value={currentUser?.email ?? ""} readOnly style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${t.border}`, borderRadius: 8, background: t.bg, color: t.text, fontSize: 13, outline: "none" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, color: t.textSec, display: "block", marginBottom: 6 }}>Foydalanuvchi Roli</label>
+                    <input type="text" value={userRole} readOnly style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${t.border}`, borderRadius: 8, background: t.bg, color: t.text, fontSize: 13, outline: "none" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : (
             <div style={{ padding: "28px 24px" }}>
               {/* Welcome */}
               <h1 style={{ fontSize: 24, fontWeight: 800, color: t.text, marginBottom: 4, letterSpacing: "-0.6px" }}>
-                Salom, creator! 👋
+                Salom, {currentUser?.email?.split("@")[0] || "creator"}! 👋
               </h1>
               <p style={{ fontSize: 13.5, color: t.textMuted, marginBottom: 28, lineHeight: 1.6 }}>
                 Najot Edu platformasiga xush kelibsiz!
@@ -849,7 +1046,7 @@ const sidebarW = collapsed ? 64 : 230;
                   <ExpandMoreIcon
                     style={{
                       fontSize: 22,
-                      color: "#9ca3af",
+                      color: "#6b7280",
                       transform: jadvaliOpen ? "rotate(180deg)" : "rotate(0deg)",
                       transition: "transform 0.22s",
                     }}
@@ -872,6 +1069,14 @@ const sidebarW = collapsed ? 64 : 230;
           )}
         </main>
       </div>
+
+      {/* Parolni o'zgartirish modali (OTP orqali) */}
+      <PasswordChangeModal
+        open={pwdModalOpen}
+        onClose={() => setPwdModalOpen(false)}
+        initialPhone={currentUser?.phone || "+998"}
+        title="Parolni o'zgartirish"
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import { resolveRoleFromLogin, setRole, normalizeRole, ROLES } from "../../api/auth";
+import PasswordChangeModal from "../../components/PasswordChangeModal";
 import {
   TextField,
   Button,
@@ -22,19 +24,70 @@ export default function Login() {
   const [alertOpen, setAlertOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Parolni tiklash modali (OTP oqimi qayta ishlatiladigan komponentда)
+  const [resetOpen, setResetOpen] = useState(false);
+
+  const redirectByRole = (role) => {
+    const r = normalizeRole(role) || ROLES.ADMIN;
+    const navLabel = r === ROLES.STUDENT ? "Bosh sahifa" : "Asosiy";
+    localStorage.setItem("activePage_nav", navLabel);
+    localStorage.setItem("activePage_page", "asosiy");
+    navigate("/dashboard");
+  };
+
+  const handleTestLogin = (role) => {
+    const payload = {
+      id: role === "ADMIN" ? 1 : role === "TEACHER" ? 2 : 3,
+      email: `${role.toLowerCase()}@najotedu.uz`,
+      role: role,
+    };
+    const token = "mockHeader." + btoa(JSON.stringify(payload)) + ".mockSignature";
+    localStorage.setItem("token", token);
+    setRole(role);
+    redirectByRole(role);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(false);
+
+    // Dev/demo: telefon o'rniga admin/teacher/student yozilsa — mock rol bilan kirish
+    const lowerPhone = phone.trim().toLowerCase();
+    if (["admin", "teacher", "student"].includes(lowerPhone)) {
+      handleTestLogin(lowerPhone.toUpperCase());
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await api.post("/auth/login", { phone, password });
-      const token = res.data?.token || res.data?.data?.token || res.data?.accessToken;
-      if (token) localStorage.setItem("token", token);
+      // Telefonni AYNAN yozilganидек yuboramiz — backend "998.." va "+998.." ni
+      // turli akkaunt deb biladi, shuning uchun formatni o'zgartirsak boshqa akkauntga kiradi.
+      const res = await api.post("/auth/login", { phone: phone.trim(), password });
+      const token =
+        res.data?.token ||
+        res.data?.data?.token ||
+        res.data?.accessToken ||
+        res.data?.data?.accessToken;
+      if (!token) {
+        setError(true);
+        return;
+      }
+      localStorage.setItem("token", token);
+      // Refresh token bo'lsa saqlaymiz; bo'lmasa eski (boshqa sessiyaдан qolgan)
+      // refreshToken'ni ALBATTA o'chiramiz — aks holda keyingi avtomatik yangilашда
+      // u ishlatilib, sessiya noto'g'ri rolga (masalan student'ga) aylanib qolishi mumkin.
+      const refreshToken =
+        res.data?.refreshToken ||
+        res.data?.refresh_token ||
+        res.data?.data?.refreshToken ||
+        res.data?.data?.refresh_token;
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+      else localStorage.removeItem("refreshToken");
+      // Rolni login javobidan (yoki token'dan) aniqlab, saqlaymiz va mos kabinetga yo'naltiramiz
+      const role = resolveRoleFromLogin(res.data, token) || ROLES.ADMIN;
+      setRole(role);
       setAlertOpen(true);
-      setTimeout(() => {
-        setAlertOpen(false);
-        navigate("/dashboard");
-      }, 1500);
+      setTimeout(() => redirectByRole(role), 1200);
     } catch {
       setError(true);
     } finally {
@@ -207,6 +260,25 @@ export default function Login() {
               {loading ? "Kirish..." : "Kirish"}
             </Button>
           </form>
+
+          {/* Parolni tiklash havolasi */}
+          <button
+            type="button"
+            onClick={() => setResetOpen(true)}
+            style={{
+              alignSelf: "flex-end",
+              marginTop: 12,
+              background: "none",
+              border: "none",
+              color: "#1c2d6e",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            Parolni unutdingizmi?
+          </button>
         </div>
 
         {/* Footer */}
@@ -224,6 +296,14 @@ export default function Login() {
           Copyright &copy; 2021 of Tashkent University of Information Technologies
         </p>
       </div>
+
+      {/* Parolni tiklash modali (OTP oqimi) */}
+      <PasswordChangeModal
+        open={resetOpen}
+        onClose={() => setResetOpen(false)}
+        initialPhone={phone}
+        title="Parolni tiklash"
+      />
     </div>
   );
 }

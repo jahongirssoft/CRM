@@ -60,7 +60,7 @@ function Avatar({ photo, name }) {
       {url ? (
         <img src={url} alt={name ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       ) : (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#9ca3af"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
       )}
     </div>
   );
@@ -79,7 +79,7 @@ function Checkbox({ checked, onChange, indeterminate }) {
       }}
     >
       {checked && <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-      {indeterminate && !checked && <div style={{ width: 8, height: 2, background: "#9ca3af", borderRadius: 1 }} />}
+      {indeterminate && !checked && <div style={{ width: 8, height: 2, background: "#6b7280", borderRadius: 1 }} />}
     </div>
   );
 }
@@ -269,7 +269,7 @@ export default function Oqituvchilar() {
   const paginated  = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
   const pages      = buildPages(safePage, totalPages);
 
-  const col = { fontSize: 12, color: "var(--text-muted, #9ca3af)", fontWeight: 500, padding: "10px 12px", textAlign: "left", whiteSpace: "nowrap" };
+  const col = { fontSize: 12, color: "var(--text-muted, #6b7280)", fontWeight: 500, padding: "10px 12px", textAlign: "left", whiteSpace: "nowrap" };
   const cell = { fontSize: 13, color: "var(--text, #374151)", padding: "13px 12px", verticalAlign: "middle" };
 
   return (
@@ -279,7 +279,7 @@ export default function Oqituvchilar() {
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text, #111)", margin: 0 }}>O&apos;qituvchilar</h1>
-          <p style={{ fontSize: 13, color: "#9ca3af", margin: "6px 0 0", maxWidth: 600 }}>
+          <p style={{ fontSize: 13, color: "#6b7280", margin: "6px 0 0", maxWidth: 600 }}>
             Ushbu sahifada siz o&apos;qituvchilar ro&apos;yxatini va ularning ma&apos;lumotlarini topasiz.
             Har bir o&apos;qituvchining ismi, fanlari va aloqa ma&apos;lumotlari keltirilgan.
           </p>
@@ -304,7 +304,7 @@ export default function Oqituvchilar() {
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ position: "relative" }}>
-              <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 17, color: "#9ca3af" }} />
+              <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 17, color: "#6b7280" }} />
               <input
                 placeholder="Search"
                 value={search}
@@ -357,7 +357,7 @@ export default function Oqituvchilar() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</td></tr>
               )}
               {!loading && paginated.map((t) => {
                 const isSelected = selected.has(t.id);
@@ -413,19 +413,19 @@ export default function Oqituvchilar() {
                           <AddIcon style={{ fontSize: 14 }} />
                         </button>
                         {/* Eye */}
-                        <button onClick={() => viewTeacher(t.id)} style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#9ca3af", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button onClick={() => viewTeacher(t.id)} style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6b7280", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <VisibilityOutlinedIcon style={{ fontSize: 16 }} />
                         </button>
                         {/* Download */}
-                        <button style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#9ca3af", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#0891b2")} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6b7280", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#0891b2")} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <DownloadingIcon style={{ fontSize: 16 }} />
                         </button>
                         {/* Delete */}
-                        <button onClick={() => { setDeleteId(t.id); setDeleteError(""); }} style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#9ca3af", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button onClick={() => { setDeleteId(t.id); setDeleteError(""); }} style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6b7280", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <DeleteOutlinedIcon style={{ fontSize: 16 }} />
                         </button>
                         {/* Edit */}
-                        <button onClick={() => openEdit(t)} style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#9ca3af", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button onClick={() => openEdit(t)} style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6b7280", padding: 0, transition: "color 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <EditOutlinedIcon style={{ fontSize: 16 }} />
                         </button>
                       </div>
@@ -447,7 +447,7 @@ export default function Oqituvchilar() {
           <div style={{ display: "flex", gap: 4 }}>
             {pages.map((p, i) => (
               <button key={i} onClick={() => typeof p === "number" && setPage(p)}
-                style={{ width: 36, height: 36, borderRadius: 8, border: "none", background: safePage === p ? PRIMARY : "transparent", color: safePage === p ? "#fff" : p === "..." ? "#9ca3af" : "#374151", fontSize: 13, fontWeight: safePage === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all 0.15s" }}>
+                style={{ width: 36, height: 36, borderRadius: 8, border: "none", background: safePage === p ? PRIMARY : "transparent", color: safePage === p ? "#fff" : p === "..." ? "#6b7280" : "#374151", fontSize: 13, fontWeight: safePage === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all 0.15s" }}>
                 {p}
               </button>
             ))}
@@ -471,9 +471,9 @@ export default function Oqituvchilar() {
         <div style={{ padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontWeight: 700, fontSize: 17, color: "var(--text, #111)", margin: 0 }}>{editId ? "O‘qituvchini tahrirlash" : "O‘qituvchi qo‘shish"}</p>
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>Bu yerda siz yangi o&apos;qituvchi qo&apos;shishingiz mumkin.</p>
+            <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>Bu yerda siz yangi o&apos;qituvchi qo&apos;shishingiz mumkin.</p>
           </div>
-          <button onClick={closeDrawer} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+          <button onClick={closeDrawer} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
             <CloseIcon style={{ fontSize: 20 }} />
           </button>
         </div>
@@ -497,7 +497,7 @@ export default function Oqituvchilar() {
           <div>
             <label style={{ fontSize: 13, fontWeight: 500, color: "#374151", display: "block", marginBottom: 6 }}>Mail</label>
             <div style={{ position: "relative" }}>
-              <EmailOutlinedIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 17, color: "#9ca3af" }} />
+              <EmailOutlinedIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 17, color: "#6b7280" }} />
               <input
                 placeholder="Elektron pochtani kiriting"
                 value={form.mail}
@@ -539,7 +539,7 @@ export default function Oqituvchilar() {
           <div>
             <label style={{ fontSize: 13, fontWeight: 500, color: "#374151", display: "block", marginBottom: 6 }}>Tug&apos;ilgan sanasi</label>
             <div style={{ position: "relative" }}>
-              <CalendarTodayIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#9ca3af" }} />
+              <CalendarTodayIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#6b7280" }} />
               <input
                 type="date"
                 value={form.birthDate}
@@ -558,7 +558,7 @@ export default function Oqituvchilar() {
               style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 8, alignItems: "center", cursor: "text" }}
               onClick={() => document.getElementById("groupInput").focus()}
             >
-              <SearchIcon style={{ fontSize: 16, color: "#9ca3af", flexShrink: 0 }} />
+              <SearchIcon style={{ fontSize: 16, color: "#6b7280", flexShrink: 0 }} />
               {form.groups.map((g) => (
                 <span key={g} style={{ display: "flex", alignItems: "center", gap: 4, background: "#6d28d9", color: "#fff", fontSize: 12, fontWeight: 500, padding: "2px 8px", borderRadius: 6 }}>
                   {g}
@@ -612,12 +612,12 @@ export default function Oqituvchilar() {
                 <img src={form.photo} alt="preview" style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, margin: "0 auto" }} />
               ) : (
                 <>
-                  <CloudUploadOutlinedIcon style={{ fontSize: 32, color: "#9ca3af", display: "block", margin: "0 auto 8px" }} />
+                  <CloudUploadOutlinedIcon style={{ fontSize: 32, color: "#6b7280", display: "block", margin: "0 auto 8px" }} />
                   <p style={{ fontSize: 13, margin: 0 }}>
                     <span style={{ color: PRIMARY, fontWeight: 600, cursor: "pointer" }}>Click to upload</span>
                     <span style={{ color: "#6b7280" }}> or drag and drop</span>
                   </p>
-                  <p style={{ fontSize: 11, color: "#9ca3af", margin: "4px 0 0" }}>JPG or PNG (max. 800x800px)</p>
+                  <p style={{ fontSize: 11, color: "#6b7280", margin: "4px 0 0" }}>JPG or PNG (max. 800x800px)</p>
                 </>
               )}
             </div>
@@ -702,13 +702,13 @@ export default function Oqituvchilar() {
           <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 420, background: "var(--card, #fff)", borderRadius: 16, boxShadow: "0 12px 40px rgba(0,0,0,0.18)", zIndex: 410, overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0" }}>
               <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>O&apos;qituvchi ma&apos;lumotlari</p>
-              <button onClick={() => setDetailTeacher(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+              <button onClick={() => setDetailTeacher(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
             <div style={{ padding: "20px 24px 24px" }}>
               {detailLoading ? (
-                <p style={{ textAlign: "center", color: "#9ca3af", fontSize: 14, padding: "24px 0" }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", color: "#6b7280", fontSize: 14, padding: "24px 0" }}>Yuklanmoqda...</p>
               ) : detailError ? (
                 <p style={{ textAlign: "center", color: "#ef4444", fontSize: 13, padding: "24px 0" }}>{detailError}</p>
               ) : detailTeacher?.name ? (
@@ -719,7 +719,7 @@ export default function Oqituvchilar() {
                     </div>
                     <div>
                       <p style={{ margin: 0, fontWeight: 700, fontSize: 16, color: "var(--text, #111)" }}>{detailTeacher.name}</p>
-                      <p style={{ margin: "3px 0 0", fontSize: 12, color: "#9ca3af" }}>{detailTeacher.email}</p>
+                      <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6b7280" }}>{detailTeacher.email}</p>
                     </div>
                   </div>
                   {[
@@ -729,13 +729,13 @@ export default function Oqituvchilar() {
                     { label: "Yaratilgan",     value: detailTeacher.createdDate },
                   ].map(({ label, value }) => (
                     <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f5f5f5" }}>
-                      <span style={{ fontSize: 13, color: "#9ca3af" }}>{label}</span>
+                      <span style={{ fontSize: 13, color: "#6b7280" }}>{label}</span>
                       <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text, #111)" }}>{value}</span>
                     </div>
                   ))}
                   {detailTeacher.groups?.length > 0 && (
                     <div style={{ marginTop: 14 }}>
-                      <p style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>Guruhlar</p>
+                      <p style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>Guruhlar</p>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                         {detailTeacher.groups.map((g, i) => (
                           <span key={i} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "#f3f4f6", color: "#374151", border: "1px solid #e5e7eb", fontWeight: 500 }}>{g}</span>
@@ -745,7 +745,7 @@ export default function Oqituvchilar() {
                   )}
                 </>
               ) : (
-                <p style={{ textAlign: "center", color: "#9ca3af", fontSize: 14, padding: "24px 0" }}>Ma&apos;lumot topilmadi</p>
+                <p style={{ textAlign: "center", color: "#6b7280", fontSize: 14, padding: "24px 0" }}>Ma&apos;lumot topilmadi</p>
               )}
             </div>
           </div>

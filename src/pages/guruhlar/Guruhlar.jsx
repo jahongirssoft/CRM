@@ -139,11 +139,11 @@ function Toggle({ on, onChange }) {
 function StatCard({ icon: Icon, label, value, avatars }) {
   return (
     <div style={{ flex: 1, background: "var(--card, #fff)", borderRadius: 14, padding: "18px 20px", boxShadow: "0 2px 8px rgba(0,0,0,.06)", display: "flex", flexDirection: "column", gap: 6, position: "relative", minWidth: 180 }}>
-      <button style={{ position: "absolute", top: 14, right: 14, border: "none", background: "none", cursor: "pointer", color: "var(--text-muted, #9ca3af)", padding: 2 }}>
+      <button style={{ position: "absolute", top: 14, right: 14, border: "none", background: "none", cursor: "pointer", color: "var(--text-muted, #6b7280)", padding: 2 }}>
         <MoreVertIcon style={{ fontSize: 18 }} />
       </button>
-      <Icon style={{ fontSize: 26, color: "var(--text-muted, #9ca3af)" }} />
-      <span style={{ fontSize: 12, color: "var(--text-muted, #9ca3af)" }}>{label}</span>
+      <Icon style={{ fontSize: 26, color: "var(--text-muted, #6b7280)" }} />
+      <span style={{ fontSize: 12, color: "var(--text-muted, #6b7280)" }}>{label}</span>
       <span style={{ fontSize: 26, fontWeight: 800, color: "var(--text, #111)" }}>{value}</span>
       {avatars && (
         <div style={{ display: "flex", marginTop: 4 }}>
@@ -249,7 +249,7 @@ function HomeworkCreate({ onBack, groupId }) {
               <option value="">Mavzulardan birini tanlang</option>
               {groupLessons.map((l) => <option key={l.id} value={l.id}>{l.topic}</option>)}
             </select>
-            <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af" }}>▼</span>
+            <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#6b7280" }}>▼</span>
           </div>
         </div>
 
@@ -280,7 +280,7 @@ function HomeworkCreate({ onBack, groupId }) {
           {selectedFile ? (
             <p style={{ fontSize: 14, fontWeight: 600, color: "#16a34a", margin: 0 }}>{selectedFile.name}</p>
           ) : (
-            <p style={{ fontSize: 14, color: "#9ca3af", margin: 0 }}>Faylni tanlash yoki shu yerga tashlang</p>
+            <p style={{ fontSize: 14, color: "#6b7280", margin: 0 }}>Faylni tanlash yoki shu yerga tashlang</p>
           )}
         </div>
         <input ref={fileRef} type="file" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
@@ -370,7 +370,7 @@ function ImtihonCreate({ onBack, groupId }) {
               <option value="">Mavzulardan birini tanlang</option>
               {groupLessons.map((l) => <option key={l.id} value={l.id}>{l.topic}</option>)}
             </select>
-            <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af" }}>▼</span>
+            <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#6b7280" }}>▼</span>
           </div>
         </div>
 
@@ -421,7 +421,7 @@ function ImtihonCreate({ onBack, groupId }) {
             {selectedFile ? (
               <p style={{ fontSize: 14, fontWeight: 600, color: "#16a34a", margin: 0 }}>{selectedFile.name}</p>
             ) : (
-              <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>Faylni tanlash yoki shu yerga tashlang</p>
+              <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>Faylni tanlash yoki shu yerga tashlang</p>
             )}
           </div>
           <input ref={fileRef} type="file" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
@@ -622,9 +622,9 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
       {/* Calendar strip */}
       <div style={{ background: "var(--card, #fff)", borderRadius: 14, padding: "16px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-          <button style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}><ChevronLeftIcon style={{ fontSize: 18 }} /></button>
+          <button style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}><ChevronLeftIcon style={{ fontSize: 18 }} /></button>
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text, #111)" }}>1-o&apos;quv oyi</span>
-          <button style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}><ChevronRightIcon style={{ fontSize: 18 }} /></button>
+          <button style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}><ChevronRightIcon style={{ fontSize: 18 }} /></button>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {CALENDAR_DATES.map((d, i) => {
@@ -637,8 +637,8 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
                 borderRadius: 8, padding: "6px 10px", minWidth: 44,
                 opacity: d.past && !isSelected ? 0.55 : 1, cursor: "pointer",
               }}>
-                <span style={{ fontSize: 10, color: isSelected ? "#fff" : "#9ca3af", fontWeight: 500 }}>{d.month}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? "#fff" : d.past ? "#9ca3af" : "#111" }}>{d.day}</span>
+                <span style={{ fontSize: 10, color: isSelected ? "#fff" : "#6b7280", fontWeight: 500 }}>{d.month}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? "#fff" : d.past ? "#6b7280" : "#111" }}>{d.day}</span>
               </div>
             );
           })}
@@ -666,7 +666,7 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
       <div style={{ background: "var(--card, #fff)", borderRadius: 14, padding: "18px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 20 }}>
         <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text, #111)", marginBottom: 14 }}>Ma&apos;lumot</p>
         {list.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#9ca3af" }}>O&apos;qituvchi biriktirilmagan</p>
+          <p style={{ fontSize: 13, color: "#6b7280" }}>O&apos;qituvchi biriktirilmagan</p>
         ) : list.map((t, ti) => {
           const name = t.fullName ?? t.full_name ?? t.name ?? "—";
           const initial = name[0]?.toUpperCase() ?? "?";
@@ -677,18 +677,18 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
           </div>
           <div>
             <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "var(--text, #111)" }}>{name}</p>
-            <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>{t.role ?? activeRole}</p>
+            <p style={{ margin: 0, fontSize: 12, color: "#6b7280" }}>{t.role ?? activeRole}</p>
           </div>
           <div style={{ marginLeft: 32 }}>
-            <p style={{ margin: 0, fontSize: 11, color: "#9ca3af" }}>Dars kuni</p>
+            <p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>Dars kuni</p>
             <p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 700, color: "var(--text, #111)" }}>{fullDate}</p>
           </div>
           <div style={{ marginLeft: 24 }}>
-            <p style={{ margin: 0, fontSize: 11, color: "#9ca3af" }}>Holat</p>
+            <p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>Holat</p>
             {(() => {
               const isHeld = saved || mavzu.trim().length > 0 || Object.keys(attendance).some((k) => attendance[k]);
               return (
-                <p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 600, color: isHeld ? "#16a34a" : (date.past ? "#9ca3af" : "#ef4444") }}>
+                <p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 600, color: isHeld ? "#16a34a" : (date.past ? "#6b7280" : "#ef4444") }}>
                   {isHeld ? "Dars o’tildi ✓" : (date.past ? "Dars o’tilmagan" : "Dars kelmagan")}
                 </p>
               );
@@ -740,7 +740,7 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1.5px solid #f0f0f0" }}>
-              <th style={{ width: 40, padding: "10px 14px", textAlign: "left", fontSize: 12, color: "#9ca3af", fontWeight: 600 }}>#</th>
+              <th style={{ width: 40, padding: "10px 14px", textAlign: "left", fontSize: 12, color: "#6b7280", fontWeight: 600 }}>#</th>
               <th style={{ padding: "10px 14px", textAlign: "left", fontSize: 12, color: "#7c3aed", fontWeight: 600 }}>O&apos;quvchi ismi</th>
               <th style={{ padding: "10px 14px", textAlign: "right", fontSize: 12, color: "#7c3aed", fontWeight: 600 }}>Keldi</th>
             </tr>
@@ -748,7 +748,7 @@ function LessonDetail({ date, group, students = [], teachers = [], onBack }) {
           <tbody>
             {students.map((s, i) => (
               <tr key={s.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
-                <td style={{ padding: "14px 14px", fontSize: 13, color: "#9ca3af" }}>{i + 1}</td>
+                <td style={{ padding: "14px 14px", fontSize: 13, color: "#6b7280" }}>{i + 1}</td>
                 <td style={{ padding: "14px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#d1d5db", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#6b7280", flexShrink: 0 }}>
@@ -1212,7 +1212,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
     { key: "jurnal",      label: "Jurnal" },
   ];
 
-  const col = { fontSize: 12, color: "var(--text-muted, #9ca3af)", fontWeight: 600, padding: "10px 16px", textAlign: "left", whiteSpace: "nowrap", letterSpacing: "0.2px" };
+  const col = { fontSize: 12, color: "var(--text-muted, #6b7280)", fontWeight: 600, padding: "10px 16px", textAlign: "left", whiteSpace: "nowrap", letterSpacing: "0.2px" };
   const cell = { fontSize: 13, color: "var(--text, #374151)", padding: "14px 16px", verticalAlign: "middle", borderTop: "1px solid var(--border, #f5f5f5)" };
 
   const filteredStudentsForModal = allStudentsList.filter((s) => {
@@ -1238,7 +1238,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
           <span style={{ fontSize: 12, fontWeight: 600, color: "#16a34a", background: "#dcfce7", padding: "3px 10px", borderRadius: 20 }}>Aktiv</span>
         </div>
         <button style={{ display: "flex", alignItems: "center", gap: 6, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "8px 16px", background: "#fff", fontSize: 13, fontWeight: 600, color: "#374151", cursor: "pointer" }}>
-          <BarChartIcon style={{ fontSize: 17, color: "#9ca3af" }} /> Statistika
+          <BarChartIcon style={{ fontSize: 17, color: "#6b7280" }} /> Statistika
         </button>
       </div>
 
@@ -1294,7 +1294,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                         <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text, #111)" }}>{group.oqituvchi}</span>
                       </>
                     ) : (
-                      <p style={{ color: "#9ca3af", fontSize: 13, margin: 0, padding: "8px 0" }}>Mentor biriktirilmagan</p>
+                      <p style={{ color: "#6b7280", fontSize: 13, margin: 0, padding: "8px 0" }}>Mentor biriktirilmagan</p>
                     )}
                   </div>
                 )}
@@ -1340,11 +1340,11 @@ function GroupDetail({ group: initialGroup, onBack }) {
             </div>
             <div>
               {groupStudents.length === 0 ? (
-                <p style={{ textAlign: "center", color: "#9ca3af", padding: 24, margin: 0 }}>Talabalar mavjud emas</p>
+                <p style={{ textAlign: "center", color: "#6b7280", padding: 24, margin: 0 }}>Talabalar mavjud emas</p>
               ) : (
                 groupStudents.map((s, i) => (
                   <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", borderBottom: "1px solid #f5f5f5" }}>
-                    <span style={{ fontSize: 12, color: "#9ca3af", width: 20, flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ fontSize: 12, color: "#6b7280", width: 20, flexShrink: 0 }}>{i + 1}</span>
                     <div style={{ width: 32, height: 32, borderRadius: "50%", background: AVATAR_COLORS[i % AVATAR_COLORS.length], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, overflow: "hidden" }}>
                       {getPhotoUrl(s) ? <img src={getPhotoUrl(s)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : s.name[0]}
                     </div>
@@ -1389,7 +1389,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
 
             {/* All study months */}
             {schedules.length === 0 ? (
-              <p style={{ color: "#9ca3af", fontSize: 13, textAlign: "center", padding: "12px 0" }}>Jadval ma&apos;lumotlari yuklanmoqda...</p>
+              <p style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "12px 0" }}>Jadval ma&apos;lumotlari yuklanmoqda...</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                 {(showAllMonths ? schedules : schedules.slice(0, 1)).map((month, idx) => (
@@ -1422,7 +1422,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                             }}
                             onMouseEnter={(e) => { if (!isFuture) e.currentTarget.style.borderColor = PRIMARY; }}
                             onMouseLeave={(e) => { if (!isFuture) e.currentTarget.style.borderColor = "#e5e7eb"; }}>
-                            <span style={{ fontSize: 11, color: "#9ca3af", fontWeight: 500 }}>{d.month}</span>
+                            <span style={{ fontSize: 11, color: "#6b7280", fontWeight: 500 }}>{d.month}</span>
                             <span style={{ fontSize: 14, fontWeight: 700, color: isPast ? "#6b7280" : "var(--text, #111)" }}>{d.day}</span>
                           </div>
                         );
@@ -1478,14 +1478,14 @@ function GroupDetail({ group: initialGroup, onBack }) {
           {darsliklarTab === "uyga_vazifa" && !hwView && (
             <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
               {homeworksLoading ? (
-                <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr style={{ background: "var(--hover-bg, #fafafa)" }}>
                       <th style={{ ...col }}>#</th>
                       <th style={{ ...col }}>Mavzu</th>
-                      <th style={{ ...col }}><PersonIcon style={{ fontSize: 15, color: "#9ca3af" }} /></th>
+                      <th style={{ ...col }}><PersonIcon style={{ fontSize: 15, color: "#6b7280" }} /></th>
                       <th style={{ ...col }}><AccessTimeIcon style={{ fontSize: 15, color: "#f59e0b" }} /></th>
                       <th style={{ ...col }}><CheckCircleOutlineIcon style={{ fontSize: 15, color: "#16a34a" }} /></th>
                       <th style={{ ...col }}>Berilgan vaqt</th>
@@ -1494,7 +1494,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   </thead>
                   <tbody>
                     {homeworks.length === 0 ? (
-                      <tr><td colSpan={7} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Uy vazifalari mavjud emas</td></tr>
+                      <tr><td colSpan={7} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Uy vazifalari mavjud emas</td></tr>
                     ) : homeworks.map((hw, i) => {
                       const hwItem = hw.homework?.[0];
                       return (
@@ -1512,7 +1512,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                             {hwItem?.created_at ? new Date(hwItem.created_at).toLocaleDateString("uz-UZ", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                           </td>
                           <td style={{ ...cell, textAlign: "right" }} onClick={(e) => e.stopPropagation()}>
-                            <button style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}>
+                            <button style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 4 }}>
                               <MoreVertIcon style={{ fontSize: 18 }} />
                             </button>
                           </td>
@@ -1539,11 +1539,11 @@ function GroupDetail({ group: initialGroup, onBack }) {
               <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", padding: "16px 20px", marginBottom: 18 }}>
                 <div style={{ display: "flex", gap: 48 }}>
                   <div>
-                    <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>Mavzu</p>
+                    <p style={{ margin: 0, fontSize: 12, color: "#6b7280" }}>Mavzu</p>
                     <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: "var(--text, #111)" }}>{hwView.hw?.topic ?? "—"}</p>
                   </div>
                   <div>
-                    <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>Berilgan vaqt</p>
+                    <p style={{ margin: 0, fontSize: 12, color: "#6b7280" }}>Berilgan vaqt</p>
                     <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: "var(--text, #111)" }}>
                       {hwView.hw?.homework?.[0]?.created_at
                         ? new Date(hwView.hw.homework[0].created_at).toLocaleDateString("uz-UZ", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
@@ -1590,20 +1590,20 @@ function GroupDetail({ group: initialGroup, onBack }) {
               {/* Results table */}
               <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
                 {hwView.resultsLoading ? (
-                  <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                  <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
                 ) : (
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ background: "var(--hover-bg, #fafafa)" }}>
-                        <th style={{ ...col, color: "#9ca3af" }}>O&apos;quvchi ismi</th>
-                        <th style={{ ...col, color: "#9ca3af" }}>Uyga vazifa jo&apos;natilgan vaqt</th>
-                        <th style={{ ...col, color: "#9ca3af" }}>Ball</th>
+                        <th style={{ ...col, color: "#6b7280" }}>O&apos;quvchi ismi</th>
+                        <th style={{ ...col, color: "#6b7280" }}>Uyga vazifa jo&apos;natilgan vaqt</th>
+                        <th style={{ ...col, color: "#6b7280" }}>Ball</th>
                         <th style={{ ...col }} />
                       </tr>
                     </thead>
                     <tbody>
                       {hwView.results.length === 0 ? (
-                        <tr><td colSpan={4} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Talabalar topilmadi</td></tr>
+                        <tr><td colSpan={4} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Talabalar topilmadi</td></tr>
                       ) : hwView.results.map((s, i) => {
                         const name = (s.fullName ?? s.full_name ?? s.name ?? `#${s.student_id ?? s.id}`);
                         const submitted = s.submitted_at ?? s.created_at;
@@ -1638,8 +1638,8 @@ function GroupDetail({ group: initialGroup, onBack }) {
                 <button onClick={() => setHwStudentView(null)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: 600, color: "var(--text, #111)", padding: 0 }}>
                   {hwView.statusTab === "PENDING" ? "Kutayotganlar" : hwView.statusTab === "REJECTED" ? "Qaytarilganlar" : hwView.statusTab === "ACCEPTED" ? "Qabul qilinganlar" : "Bajarilmagan"}
                 </button>
-                <span style={{ color: "#9ca3af" }}>›</span>
-                <span style={{ color: "#9ca3af" }}>Uyga vazifa</span>
+                <span style={{ color: "#6b7280" }}>›</span>
+                <span style={{ color: "#6b7280" }}>Uyga vazifa</span>
               </div>
 
               {/* === UY VAZIFASI TOPSHIRIG'I === */}
@@ -1666,7 +1666,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                     <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--text,#111)" }}>
                       {hwStudentView.student?.fullName ?? hwStudentView.student?.full_name ?? hwStudentView.student?.name ?? "Talaba"}
                     </p>
-                    <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9ca3af" }}>Talaba javobi</p>
+                    <p style={{ margin: "2px 0 0", fontSize: 12, color: "#6b7280" }}>Talaba javobi</p>
                   </div>
                   <div style={{ marginLeft: "auto" }}>
                     {(() => {
@@ -1688,7 +1688,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                     { label: "Fayllar soni", value: hwStudentView.detail?.files?.length ?? hwStudentView.student?.file_count ?? 0 },
                   ].map(({ label, value }) => (
                     <div key={label}>
-                      <p style={{ margin: 0, fontSize: 11, color: "#9ca3af", fontWeight: 500, textTransform: "uppercase", letterSpacing: ".5px" }}>{label}</p>
+                      <p style={{ margin: 0, fontSize: 11, color: "#6b7280", fontWeight: 500, textTransform: "uppercase", letterSpacing: ".5px" }}>{label}</p>
                       <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: "var(--text,#111)" }}>{value}</p>
                     </div>
                   ))}
@@ -1728,7 +1728,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                     </div>
                   </div>
                 )}
-                {hwStudentView.loading && <div style={{ padding: "16px 20px", color: "#9ca3af", fontSize: 13 }}>Yuklanmoqda...</div>}
+                {hwStudentView.loading && <div style={{ padding: "16px 20px", color: "#6b7280", fontSize: 13 }}>Yuklanmoqda...</div>}
               </div>
 
               {/* === BAHOLASH === */}
@@ -1755,7 +1755,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                         onChange={(e) => setHwStudentView((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
                         style={{ width: 72, padding: "8px 10px", border: "1.5px solid #e5e7eb", borderRadius: 10, fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none", background: "var(--input-bg,#fff)", color: "var(--text,#111)" }} />
                     </div>
-                    <p style={{ margin: "10px 0 0", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali</p>
+                    <p style={{ margin: "10px 0 0", fontSize: 12, color: "#6b7280", textAlign: "center" }}>O&apos;tish bali</p>
                   </div>
 
                   {/* Comment */}
@@ -1796,9 +1796,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
           {darsliklarTab === "videolar" && (
             <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
               {filesLoading ? (
-                <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
               ) : groupFiles.length === 0 ? (
-                <p style={{ textAlign: "center", padding: "48px 24px", color: "#9ca3af", fontSize: 14 }}>Fayllar mavjud emas</p>
+                <p style={{ textAlign: "center", padding: "48px 24px", color: "#6b7280", fontSize: 14 }}>Fayllar mavjud emas</p>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -1866,7 +1866,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                             {f.created_at ? new Date(f.created_at).toLocaleDateString("uz-UZ", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                           </td>
                           <td style={{ ...cell, textAlign: "right" }} onClick={(e) => e.stopPropagation()}>
-                            <button style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}>
+                            <button style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 4 }}>
                               <MoreVertIcon style={{ fontSize: 18 }} />
                             </button>
                           </td>
@@ -1882,7 +1882,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
           {darsliklarTab === "jurnal" && (
             <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
               {lessonsLoading ? (
-                <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -1895,7 +1895,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   </thead>
                   <tbody>
                     {lessons.length === 0 ? (
-                      <tr><td colSpan={4} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Darslar mavjud emas</td></tr>
+                      <tr><td colSpan={4} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Darslar mavjud emas</td></tr>
                     ) : lessons.map((lesson, i) => (
                       <tr key={lesson.id}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
@@ -1906,7 +1906,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                           {new Date(lesson.created_at).toLocaleDateString("uz-UZ", { day: "numeric", month: "short", year: "numeric" })}
                         </td>
                         <td style={{ ...cell, textAlign: "right" }}>
-                          <button style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}>
+                          <button style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 4 }}>
                             <MoreVertIcon style={{ fontSize: 18 }} />
                           </button>
                         </td>
@@ -1921,7 +1921,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
           {darsliklarTab === "imtihonlar" && !examView && (
             <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
               {examListLoading ? (
-                <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -1938,7 +1938,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   </thead>
                   <tbody>
                     {examList.length === 0 ? (
-                      <tr><td colSpan={8} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Imtihonlar mavjud emas</td></tr>
+                      <tr><td colSpan={8} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Imtihonlar mavjud emas</td></tr>
                     ) : examList.map((ex, i) => {
                       const isActive = ex.status === "active";
                       return (
@@ -1961,7 +1961,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                             {ex.deadline ? new Date(ex.deadline).toLocaleDateString("uz-UZ", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                           </td>
                           <td style={{ ...cell, textAlign: "right" }} onClick={(e) => e.stopPropagation()}>
-                            <button style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}>
+                            <button style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 4 }}>
                               <MoreVertIcon style={{ fontSize: 18 }} />
                             </button>
                           </td>
@@ -1984,7 +1984,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                   </button>
                   <div>
                     <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "var(--text, #111)" }}>{examView.exam.topic ?? "Imtihon"}</h3>
-                    <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9ca3af" }}>
+                    <p style={{ margin: "2px 0 0", fontSize: 12, color: "#6b7280" }}>
                       {examView.exam.created_at ? new Date(examView.exam.created_at).toLocaleString("uz-UZ") : ""}
                       {examView.exam.deadline ? ` — ${new Date(examView.exam.deadline).toLocaleString("uz-UZ")}` : ""}
                     </p>
@@ -2018,7 +2018,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
               {/* Students table */}
               <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
                 {examView.resultsLoading ? (
-                  <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                  <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
                 ) : (
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
@@ -2032,7 +2032,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                     </thead>
                     <tbody>
                       {examView.results.length === 0 ? (
-                        <tr><td colSpan={5} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Talabalar topilmadi</td></tr>
+                        <tr><td colSpan={5} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Talabalar topilmadi</td></tr>
                       ) : examView.results.map((s, i) => {
                         const name = (s.fullName ?? s.full_name ?? s.name ?? `#${s.student_id ?? s.id}`);
                         const submitted = s.submitted_at ?? s.created_at;
@@ -2082,7 +2082,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
           )}
 
           {darsliklarTab !== "uyga_vazifa" && darsliklarTab !== "videolar" && darsliklarTab !== "jurnal" && darsliklarTab !== "imtihonlar" && (
-            <div style={{ background: "#fff", borderRadius: 14, padding: "48px 24px", textAlign: "center", color: "#9ca3af", fontSize: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+            <div style={{ background: "#fff", borderRadius: 14, padding: "48px 24px", textAlign: "center", color: "#6b7280", fontSize: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
               <p style={{ fontSize: 15, fontWeight: 600, color: "#d1d5db", marginBottom: 6 }}>{DARS_TABS.find(t => t.key === darsliklarTab)?.label}</p>
               Bu bo&apos;lim tez orada qo&apos;shiladi
             </div>
@@ -2095,7 +2095,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
               <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 560, background: "var(--card, #fff)", borderRadius: 16, boxShadow: "0 12px 40px rgba(0,0,0,0.18)", zIndex: 410, overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 14px" }}>
                   <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Qo&apos;shish</p>
-                  <button onClick={() => setVideoModal(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+                  <button onClick={() => setVideoModal(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
                     <CloseIcon style={{ fontSize: 20 }} />
                   </button>
                 </div>
@@ -2125,7 +2125,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                         <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text, #111)", margin: 0, textAlign: "center" }}>
                           Faylni yuklash uchun bosing yoki shu yerga olib keling
                         </p>
-                        <p style={{ fontSize: 12, color: "#9ca3af", margin: 0, textAlign: "center" }}>
+                        <p style={{ fontSize: 12, color: "#6b7280", margin: 0, textAlign: "center" }}>
                           Video, rasm, hujjat formatlarini qo&apos;llab-quvvatlaydi
                         </p>
                       </>
@@ -2179,10 +2179,10 @@ function GroupDetail({ group: initialGroup, onBack }) {
         <div style={{ background: "var(--card, #fff)", borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
           <div style={{ padding: "16px 20px", borderBottom: "1px solid #f5f5f5", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text, #111)" }}>Akademik davomati</span>
-            <span style={{ fontSize: 13, color: "#9ca3af" }}>Jami yozuvlar: {attendance.length}</span>
+            <span style={{ fontSize: 13, color: "#6b7280" }}>Jami yozuvlar: {attendance.length}</span>
           </div>
           {attendanceLoading && attendance.length === 0 ? (
-            <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+            <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
           ) : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -2197,7 +2197,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                 </thead>
                 <tbody>
                   {attendance.length === 0 ? (
-                    <tr><td colSpan={5} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Davomat ma&apos;lumotlari mavjud emas</td></tr>
+                    <tr><td colSpan={5} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Davomat ma&apos;lumotlari mavjud emas</td></tr>
                   ) : attendance.map((a, i) => {
                     const student = groupStudents.find((s) => s.id === a.student_id);
                     return (
@@ -2205,7 +2205,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                         onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "var(--card, #fff)")}>
                         <td style={{ ...cell }}>{i + 1}</td>
-                        <td style={{ ...cell, color: "#9ca3af", fontSize: 12 }}>#{a.student_id}</td>
+                        <td style={{ ...cell, color: "#6b7280", fontSize: 12 }}>#{a.student_id}</td>
                         <td style={{ ...cell, fontWeight: 500, color: "var(--text, #111)" }}>{student?.name ?? "—"}</td>
                         <td style={{ ...cell }}>
                           <span style={{ fontSize: 12, fontWeight: 600, color: a.isPresent ? "#16a34a" : "#ef4444", background: a.isPresent ? "#dcfce7" : "#fee2e2", padding: "3px 10px", borderRadius: 20 }}>
@@ -2234,26 +2234,26 @@ function GroupDetail({ group: initialGroup, onBack }) {
               <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "80%" }}>
                 {videoPlayer.name}
               </p>
-              <button onClick={() => { if (videoPlayer?.blobUrl) URL.revokeObjectURL(videoPlayer.blobUrl); setVideoPlayer(null); }} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+              <button onClick={() => { if (videoPlayer?.blobUrl) URL.revokeObjectURL(videoPlayer.blobUrl); setVideoPlayer(null); }} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
             {videoPlayer.blobLoading ? (
               <div style={{ padding: "48px 24px", textAlign: "center" }}>
-                <p style={{ color: "#9ca3af", margin: 0, fontSize: 14 }}>Video yuklanmoqda...</p>
+                <p style={{ color: "#6b7280", margin: 0, fontSize: 14 }}>Video yuklanmoqda...</p>
               </div>
             ) : videoPlayer.isVideo ? (
               videoPlayer.blobUrl ? (
                 <video controls autoPlay style={{ width: "100%", maxHeight: "70vh", display: "block", background: "#000" }} src={videoPlayer.blobUrl} />
               ) : (
                 <div style={{ padding: "40px 24px", textAlign: "center" }}>
-                  <p style={{ color: "#9ca3af", margin: "0 0 12px", fontSize: 14 }}>Video ochilmadi</p>
+                  <p style={{ color: "#6b7280", margin: "0 0 12px", fontSize: 14 }}>Video ochilmadi</p>
                   <p style={{ color: "#6b7280", margin: 0, fontSize: 12 }}>{videoPlayer.fileUrl ?? "URL topilmadi"}</p>
                 </div>
               )
             ) : (
               <div style={{ padding: "32px 24px", textAlign: "center", background: "#1a1a1a" }}>
-                <p style={{ color: "#9ca3af", margin: "0 0 16px", fontSize: 14 }}>Bu video fayl emas</p>
+                <p style={{ color: "#6b7280", margin: "0 0 16px", fontSize: 14 }}>Bu video fayl emas</p>
                 {videoPlayer.fileUrl && (
                   <a href={buildVideoUrl(videoPlayer.fileUrl)}
                     target="_blank" rel="noreferrer"
@@ -2274,7 +2274,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
           <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 500, background: "var(--card, #fff)", borderRadius: 16, boxShadow: "0 12px 40px rgba(0,0,0,0.18)", zIndex: 510, overflow: "hidden" }}>
             <div style={{ padding: "20px 24px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f0f0f0" }}>
               <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Baholash</p>
-              <button onClick={() => setGradeModal(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+              <button onClick={() => setGradeModal(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
@@ -2285,25 +2285,25 @@ function GroupDetail({ group: initialGroup, onBack }) {
                 {gradeModal.student?.fullName ?? gradeModal.student?.full_name ?? gradeModal.student?.name ?? "Talaba"}
               </p>
               <div style={{ display: "flex", gap: 20, marginTop: 8 }}>
-                <div><p style={{ margin: 0, fontSize: 11, color: "#9ca3af" }}>Fayllar soni</p><p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 600, color: "var(--text, #111)" }}>{gradeModal.student?.file_count ?? 0}</p></div>
-                <div><p style={{ margin: 0, fontSize: 11, color: "#9ca3af" }}>Status</p>
+                <div><p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>Fayllar soni</p><p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 600, color: "var(--text, #111)" }}>{gradeModal.student?.file_count ?? 0}</p></div>
+                <div><p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>Status</p>
                   <span style={{ fontSize: 12, fontWeight: 600, color: "#f59e0b", background: "#fef3c7", padding: "2px 8px", borderRadius: 12 }}>
                     {gradeModal.student?.status ?? "Kutayabti"}
                   </span>
                 </div>
               </div>
               {gradeModal.detailLoading && (
-                <p style={{ margin: "8px 0 0", fontSize: 12, color: "#9ca3af" }}>Javob yuklanmoqda...</p>
+                <p style={{ margin: "8px 0 0", fontSize: 12, color: "#6b7280" }}>Javob yuklanmoqda...</p>
               )}
               {!gradeModal.detailLoading && (gradeModal.detail?.answer ?? gradeModal.student?.answer) && (
                 <div style={{ marginTop: 12, padding: "10px 14px", background: "#fff", borderLeft: "3px solid #7c3aed", borderRadius: "0 8px 8px 0", fontSize: 13, color: "#374151" }}>
-                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>Uyga vazifa izohi:</p>
+                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#6b7280", fontWeight: 600 }}>Uyga vazifa izohi:</p>
                   {gradeModal.detail?.answer ?? gradeModal.student?.answer}
                 </div>
               )}
               {!gradeModal.detailLoading && gradeModal.detail?.files?.length > 0 && (
                 <div style={{ marginTop: 8 }}>
-                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>Fayllar ({gradeModal.detail.files.length}):</p>
+                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#6b7280", fontWeight: 600 }}>Fayllar ({gradeModal.detail.files.length}):</p>
                   {gradeModal.detail.files.map((f, i) => (
                     <a key={i} href={f.url ?? f.path ?? "#"} target="_blank" rel="noreferrer"
                       style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: PRIMARY, padding: "3px 0", textDecoration: "none" }}>
@@ -2332,7 +2332,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                     onChange={(e) => setGradeModal((p) => ({ ...p, score: Math.min(100, Math.max(0, Number(e.target.value))) }))}
                     style={{ width: 76, padding: "10px 8px", border: "1.5px solid #e2e8f0", borderRadius: 12, fontSize: 20, fontWeight: 700, textAlign: "center", outline: "none", background: "#fff", color: "#111", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }} />
                 </div>
-                <p style={{ margin: "10px 0 0", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>O&apos;tish bali</p>
+                <p style={{ margin: "10px 0 0", fontSize: 12, color: "#6b7280", textAlign: "center" }}>O&apos;tish bali</p>
               </div>
 
               {/* Comment */}
@@ -2369,25 +2369,25 @@ function GroupDetail({ group: initialGroup, onBack }) {
             <div style={{ padding: "20px 24px 14px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", borderBottom: "1px solid #f0f0f0" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Uy vazifa natijalari</p>
-                <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{hwResultModal.hw?.mavzu}</p>
+                <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{hwResultModal.hw?.mavzu}</p>
               </div>
-              <button onClick={() => setHwResultModal((p) => ({ ...p, open: false }))} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+              <button onClick={() => setHwResultModal((p) => ({ ...p, open: false }))} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
             <div style={{ flex: 1, overflowY: "auto" }}>
               {hwResultModal.loading ? (
-                <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</p>
               ) : hwResultModal.results.length === 0 ? (
-                <p style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Hali natijalar yo&apos;q</p>
+                <p style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Hali natijalar yo&apos;q</p>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr style={{ background: "var(--hover-bg, #fafafa)" }}>
-                      <th style={{ fontSize: 12, color: "#9ca3af", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>#</th>
-                      <th style={{ fontSize: 12, color: "#9ca3af", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>Talaba</th>
-                      <th style={{ fontSize: 12, color: "#9ca3af", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>Holat</th>
-                      <th style={{ fontSize: 12, color: "#9ca3af", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>Ball</th>
+                      <th style={{ fontSize: 12, color: "#6b7280", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>#</th>
+                      <th style={{ fontSize: 12, color: "#6b7280", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>Talaba</th>
+                      <th style={{ fontSize: 12, color: "#6b7280", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>Holat</th>
+                      <th style={{ fontSize: 12, color: "#6b7280", fontWeight: 600, padding: "10px 16px", textAlign: "left" }}>Ball</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2398,7 +2398,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
                       const statusBg   = status === "ACCEPTED" ? "#dcfce7"  : status === "REJECTED" ? "#fee2e2"  : "#fef3c7";
                       return (
                         <tr key={i} style={{ borderTop: "1px solid var(--border, #f5f5f5)" }}>
-                          <td style={{ padding: "12px 16px", fontSize: 13, color: "#9ca3af" }}>{i + 1}</td>
+                          <td style={{ padding: "12px 16px", fontSize: 13, color: "#6b7280" }}>{i + 1}</td>
                           <td style={{ padding: "12px 16px", fontSize: 14, fontWeight: 500, color: "var(--text, #111)" }}>{name}</td>
                           <td style={{ padding: "12px 16px" }}>
                             <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: statusBg, padding: "3px 10px", borderRadius: 20 }}>{status}</span>
@@ -2421,9 +2421,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
         <div style={{ padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Uy vazifa qo&apos;shish</p>
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{group.name} guruhiga</p>
+            <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{group.name} guruhiga</p>
           </div>
-          <button onClick={() => setHwDrawer(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+          <button onClick={() => setHwDrawer(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
             <CloseIcon style={{ fontSize: 20 }} />
           </button>
         </div>
@@ -2459,9 +2459,9 @@ function GroupDetail({ group: initialGroup, onBack }) {
         <div style={{ padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Dars qo&apos;shish</p>
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{group.name} guruhiga yangi dars</p>
+            <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{group.name} guruhiga yangi dars</p>
           </div>
-          <button onClick={() => setLessonDrawer(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+          <button onClick={() => setLessonDrawer(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
             <CloseIcon style={{ fontSize: 20 }} />
           </button>
         </div>
@@ -2493,15 +2493,15 @@ function GroupDetail({ group: initialGroup, onBack }) {
             <div style={{ padding: "20px 20px 12px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Talaba qo&apos;shish</p>
-                <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{group.name} guruhiga talaba qo&apos;shish</p>
+                <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{group.name} guruhiga talaba qo&apos;shish</p>
               </div>
-              <button onClick={() => setAddStudentModal(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 2, display: "flex" }}>
+              <button onClick={() => setAddStudentModal(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 2, display: "flex" }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
             <div style={{ padding: "0 16px 10px" }}>
               <div style={{ position: "relative" }}>
-                <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#9ca3af" }} />
+                <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#6b7280" }} />
                 <input placeholder="Talaba qidirish..." value={studentModalSearch} onChange={(e) => setStudentModalSearch(e.target.value)} autoFocus
                   style={{ width: "100%", padding: "8px 12px 8px 32px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", boxSizing: "border-box" }}
                   onFocus={(e) => (e.target.style.border = `1.5px solid ${PRIMARY}`)} onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
@@ -2509,7 +2509,7 @@ function GroupDetail({ group: initialGroup, onBack }) {
             </div>
             <div style={{ maxHeight: 280, overflowY: "auto", borderTop: "1px solid var(--border, #f5f5f5)", borderBottom: "1px solid #f5f5f5" }}>
               {filteredStudentsForModal.length === 0 ? (
-                <p style={{ fontSize: 13, color: "#9ca3af", textAlign: "center", padding: "20px 0" }}>Topilmadi</p>
+                <p style={{ fontSize: 13, color: "#6b7280", textAlign: "center", padding: "20px 0" }}>Topilmadi</p>
               ) : filteredStudentsForModal.map((s) => {
                 const name = s.fullName ?? s.full_name ?? s.name ?? "—";
                 const isSelected = selectedStudentId === s.id;
@@ -2721,7 +2721,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
       .catch(() => setDeleteId(null));
   };
 
-  const col  = { fontSize: 12, color: "var(--text-muted, #9ca3af)", fontWeight: 500, padding: "10px 14px", textAlign: "left", whiteSpace: "nowrap" };
+  const col  = { fontSize: 12, color: "var(--text-muted, #6b7280)", fontWeight: 500, padding: "10px 14px", textAlign: "left", whiteSpace: "nowrap" };
   const cell = { fontSize: 13, color: "var(--text, #374151)", padding: "14px 14px", verticalAlign: "middle" };
 
   if (selectedGroup) return <GroupDetail group={selectedGroup} onBack={() => setSelectedGroup(null)} />;
@@ -2768,13 +2768,13 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                 <th style={{ ...col }}>O&apos;qituvchi</th>
                 <th style={{ ...col }}>Talabalar</th>
                 <th style={{ ...col, textAlign: "right", paddingRight: 16 }}>
-                  <RefreshIcon style={{ fontSize: 16, cursor: "pointer", color: "#9ca3af" }} />
+                  <RefreshIcon style={{ fontSize: 16, cursor: "pointer", color: "#6b7280" }} />
                 </th>
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</td></tr>
+                <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</td></tr>
               )}
               {!loading && groups.map((g) => (
                 <tr key={g.id} style={{ borderTop: "1px solid var(--border, #f5f5f5)", cursor: "pointer" }}
@@ -2784,7 +2784,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                   <td style={{ ...cell }} onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <Toggle on={g.active} onChange={() => toggleActive(g.id)} />
-                      <span style={{ fontSize: 12, fontWeight: 600, color: g.active ? "#16a34a" : "#9ca3af" }}>{g.active ? "FAOL" : "NOFAOL"}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: g.active ? "#16a34a" : "#6b7280" }}>{g.active ? "FAOL" : "NOFAOL"}</span>
                     </div>
                   </td>
                   <td style={{ ...cell, fontWeight: 600, color: PRIMARY }}>{g.name}</td>
@@ -2793,7 +2793,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                   <td style={{ ...cell }}>
                     <div>
                       <p style={{ margin: 0, fontWeight: 600, color: "var(--text, #111)" }}>{g.vaqt}</p>
-                      <p style={{ margin: "2px 0 0", fontSize: 11, color: "#9ca3af" }}>{g.kunlar.join(", ")}</p>
+                      <p style={{ margin: "2px 0 0", fontSize: 11, color: "#6b7280" }}>{g.kunlar.join(", ")}</p>
                     </div>
                   </td>
                   <td style={{ ...cell }}>{g.xona}</td>
@@ -2801,14 +2801,14 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                   <td style={{ ...cell, fontWeight: 600, color: "var(--text, #111)" }}>{g.talabalar}</td>
                   <td style={{ ...cell, textAlign: "right", paddingRight: 16 }} onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <button onClick={() => openEditDrawer(g)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}
+                      <button onClick={() => openEditDrawer(g)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 4 }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                         <EditOutlinedIcon style={{ fontSize: 17 }} />
                       </button>
-                      <button onClick={() => setDeleteId(g.id)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }}
+                      <button onClick={() => setDeleteId(g.id)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 4 }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                         <DeleteOutlineIcon style={{ fontSize: 18 }} />
                       </button>
                     </div>
@@ -2843,13 +2843,13 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
             <div style={{ padding: "20px 20px 12px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>{addModal === "talaba" ? "Talaba qo'shish" : "O'qituvchi qo'shish"}</p>
-                <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{addModal === "talaba" ? "Bitta yoki bir nechta talabani tanlang" : "Bitta yoki bir nechta o'qituvchini tanlang"}</p>
+                <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{addModal === "talaba" ? "Bitta yoki bir nechta talabani tanlang" : "Bitta yoki bir nechta o'qituvchini tanlang"}</p>
               </div>
-              <button onClick={closeAddModal} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 2, display: "flex" }}><CloseIcon style={{ fontSize: 20 }} /></button>
+              <button onClick={closeAddModal} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 2, display: "flex" }}><CloseIcon style={{ fontSize: 20 }} /></button>
             </div>
             <div style={{ padding: "0 16px 10px" }}>
               <div style={{ position: "relative" }}>
-                <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#9ca3af" }} />
+                <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#6b7280" }} />
                 <input placeholder={addModal === "talaba" ? "Talaba qidirish..." : "O'qituvchi qidirish..."} value={modalSearch} onChange={(e) => setModalSearch(e.target.value)} autoFocus
                   style={{ width: "100%", padding: "8px 12px 8px 32px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", boxSizing: "border-box" }}
                   onFocus={(e) => (e.target.style.border = `1.5px solid ${PRIMARY}`)} onBlur={(e) => (e.target.style.border = "1.5px solid #e5e7eb")} />
@@ -2857,7 +2857,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
             </div>
             <div style={{ maxHeight: 260, overflowY: "auto", borderTop: "1px solid var(--border, #f5f5f5)", borderBottom: "1px solid #f5f5f5" }}>
               {modalList().length === 0 ? (
-                <p style={{ fontSize: 13, color: "#9ca3af", textAlign: "center", padding: "20px 0" }}>Topilmadi</p>
+                <p style={{ fontSize: 13, color: "#6b7280", textAlign: "center", padding: "20px 0" }}>Topilmadi</p>
               ) : modalList().map((item) => {
                 const checked = !!tempSel.find((x) => x.id === item.id);
                 return (
@@ -2888,9 +2888,9 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
         <div style={{ padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>{editId ? "Guruhni tahrirlash" : "Guruh qo’shish"}</p>
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{editId ? "Guruh ma‘lumotlarini yangilang." : "Yangi guruh yaratish uchun quyidagi ma‘lumotlarni kiriting."}</p>
+            <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{editId ? "Guruh ma‘lumotlarini yangilang." : "Yangi guruh yaratish uchun quyidagi ma‘lumotlarni kiriting."}</p>
           </div>
-          <button onClick={closeDrawer} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}><CloseIcon style={{ fontSize: 20 }} /></button>
+          <button onClick={closeDrawer} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}><CloseIcon style={{ fontSize: 20 }} /></button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           <FInput label="Guruh nomi" required><input placeholder="Frontend 2024" value={form.name} onChange={(e) => set("name", e.target.value)} style={inputSx} onFocus={focusBorder} onBlur={blurBorder} /></FInput>
@@ -2902,7 +2902,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                   ? coursesList.map((c) => <option key={c.id} value={c.id}>{c.name ?? c.title}</option>)
                   : KURS_LIST.map((k) => <option key={k} value={k}>{k}</option>)}
               </select>
-              <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af", fontSize: 12 }}>▼</span>
+              <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#6b7280", fontSize: 12 }}>▼</span>
             </div>
           </FInput>
           <FInput label="Xona" required>
@@ -2913,7 +2913,7 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
                   ? roomsList.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)
                   : XONA_LIST.map((x) => <option key={x} value={x}>{x}</option>)}
               </select>
-              <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af", fontSize: 12 }}>▼</span>
+              <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#6b7280", fontSize: 12 }}>▼</span>
             </div>
           </FInput>
           <FInput label="Dars kunlari" required>

@@ -4,7 +4,8 @@ export const imgUrl = (filename) => {
   if (!filename) return null;
   // Agar to'liq URL bo'lsa, to'g'ridan ishlat
   if (filename.startsWith("http")) return filename;
-  return `${FILE_BASE}/${filename}`;
+  // Fayllar (rasm/video) bu backendда /files/files/{fayl} dan beriladi (public)
+  return `${FILE_BASE}/files/${filename}`;
 };
 
 // Talaba/o'qituvchi obyektidan foto URL ni topadi

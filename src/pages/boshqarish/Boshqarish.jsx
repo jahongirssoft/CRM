@@ -9,6 +9,7 @@ import api from "../../api/axios";
 import { getPhotoUrl } from "../../api/fileUrl";
 
 const PRIMARY = "#7c3aed";
+const ACCENT = "#7c3aed"; // binafsha aksent — tab chiziqlari (referensdek)
 
 const TABS = [
   "Kurslar", "Xonalar", "Xodimlar", "Darslar", "Sabablar", "Xabar yuborish",
@@ -46,8 +47,8 @@ const PERIODS = [
    KURSLAR TAB
 ════════════════════════════════════ */
 function KurslarTab({ darkMode = false }) {
-  const t = darkMode ? { card:"#1e293b", border:"#334155", text:"#f1f5f9", textSec:"#94a3b8", textMuted:"#64748b", inputBg:"#0f172a" }
-    : { card:"#ffffff", border:"#e5e7eb", text:"#111111", textSec:"#374151", textMuted:"#9ca3af", inputBg:"#ffffff" };
+  const t = darkMode ? { card:"#1e293b", border:"#334155", text:"#f1f5f9", textSec:"#94a3b8", textMuted:"#94a3b8", inputBg:"#0f172a" }
+    : { card:"#ffffff", border:"#e5e7eb", text:"#111111", textSec:"#374151", textMuted:"#6b7280", inputBg:"#ffffff" };
   const [courses, setCourses]           = useState([]);
   const [loading, setLoading]           = useState(true);
   const [isArchive, setIsArchive]       = useState(false);
@@ -336,8 +337,8 @@ function KurslarTab({ darkMode = false }) {
    XONALAR TAB
 ════════════════════════════════════ */
 function XonalarTab({ darkMode = false }) {
-  const t = darkMode ? { card:"#1e293b", border:"#334155", text:"#f1f5f9", textSec:"#94a3b8", textMuted:"#64748b", inputBg:"#0f172a" }
-    : { card:"#ffffff", border:"#e5e7eb", text:"#111111", textSec:"#374151", textMuted:"#9ca3af", inputBg:"#ffffff" };
+  const t = darkMode ? { card:"#1e293b", border:"#334155", text:"#f1f5f9", textSec:"#94a3b8", textMuted:"#94a3b8", inputBg:"#0f172a" }
+    : { card:"#ffffff", border:"#e5e7eb", text:"#111111", textSec:"#374151", textMuted:"#6b7280", inputBg:"#ffffff" };
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -479,7 +480,7 @@ function XonalarTab({ darkMode = false }) {
       </div>
 
       {/* Rooms grid */}
-      {loading && <p style={{ textAlign: "center", color: "#9ca3af", padding: "24px 0", fontSize: 14 }}>Yuklanmoqda...</p>}
+      {loading && <p style={{ textAlign: "center", color: "#6b7280", padding: "24px 0", fontSize: 14 }}>Yuklanmoqda...</p>}
       <div className="xonalar-grid">
         {!loading && rooms.map((room) => (
           <div
@@ -705,8 +706,8 @@ const INIT_ADMIN_FORM = { first_name: "", last_name: "", password: "", phone: ""
 
 function XodimlarTab({ darkMode = false }) {
   const t = darkMode
-    ? { card: "#1e293b", border: "#334155", text: "#f1f5f9", textSec: "#94a3b8", textMuted: "#64748b", inputBg: "#0f172a" }
-    : { card: "#ffffff", border: "#e5e7eb", text: "#111111", textSec: "#374151", textMuted: "#9ca3af", inputBg: "#ffffff" };
+    ? { card: "#1e293b", border: "#334155", text: "#f1f5f9", textSec: "#94a3b8", textMuted: "#94a3b8", inputBg: "#0f172a" }
+    : { card: "#ffffff", border: "#e5e7eb", text: "#111111", textSec: "#374151", textMuted: "#6b7280", inputBg: "#ffffff" };
 
   const [admins, setAdmins]       = useState([]);
   const [loading, setLoading]     = useState(true);
@@ -870,8 +871,8 @@ function XodimlarTab({ darkMode = false }) {
 ════════════════════════════════════ */
 function DarslarTab({ darkMode = false }) {
   const t = darkMode
-    ? { card: "#1e293b", border: "#334155", text: "#f1f5f9", textSec: "#94a3b8", textMuted: "#64748b" }
-    : { card: "#ffffff", border: "#e5e7eb", text: "#111111", textSec: "#374151", textMuted: "#9ca3af" };
+    ? { card: "#1e293b", border: "#334155", text: "#f1f5f9", textSec: "#94a3b8", textMuted: "#94a3b8" }
+    : { card: "#ffffff", border: "#e5e7eb", text: "#111111", textSec: "#374151", textMuted: "#6b7280" };
 
   const [lessons, setLessons]   = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -1030,10 +1031,10 @@ export default function Boshqarish({ initialTab = "Xonalar", darkMode = false })
   const [activeTab, setActiveTab] = useState(initialTab);
   const t = darkMode ? {
     bg: "#0f172a", card: "#1e293b", border: "#334155",
-    text: "#f1f5f9", textSec: "#94a3b8", textMuted: "#64748b",
+    text: "#f1f5f9", textSec: "#94a3b8", textMuted: "#94a3b8",
   } : {
     bg: "#f6f7fb", card: "#ffffff", border: "#f0f0f0",
-    text: "#111111", textSec: "#6b7280", textMuted: "#9ca3af",
+    text: "#111111", textSec: "#6b7280", textMuted: "#6b7280",
   };
 
   return (
@@ -1055,11 +1056,11 @@ export default function Boshqarish({ initialTab = "Xonalar", darkMode = false })
             style={{
               padding: "10px 18px",
               border: "none",
-              borderBottom: activeTab === tab ? `2.5px solid ${PRIMARY}` : "2.5px solid transparent",
+              borderBottom: activeTab === tab ? `2.5px solid ${ACCENT}` : "2.5px solid transparent",
               background: "none",
               cursor: "pointer",
               fontSize: 13.5,
-              color: activeTab === tab ? PRIMARY : t.textSec,
+              color: activeTab === tab ? ACCENT : t.textSec,
               fontWeight: activeTab === tab ? 700 : 500,
               whiteSpace: "nowrap",
               letterSpacing: "-0.1px",

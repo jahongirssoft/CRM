@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../api/axios";
+import { getCurrentUser, ROLES } from "../../api/auth";
 import { imgUrl, getPhotoUrl } from "../../api/fileUrl";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
@@ -46,7 +47,7 @@ function FInput({ label, placeholder, value, onChange, type = "text", icon: Icon
     <div>
       <label style={{ fontSize: 13, fontWeight: 500, color: "#374151", display: "block", marginBottom: 6 }}>{label}</label>
       <div style={{ position: "relative" }}>
-        {Icon && <Icon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#9ca3af" }} />}
+        {Icon && <Icon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#6b7280" }} />}
         <input
           type={type}
           placeholder={placeholder}
@@ -71,6 +72,9 @@ function CB({ checked, onChange }) {
 }
 
 export default function Talabalar() {
+  const currentUser = getCurrentUser();
+  const isStudent = currentUser?.role === ROLES.STUDENT;
+
   const [students, setStudents] = useState(INIT_STUDENTS);
   const [loading,  setLoading]  = useState(false);
   const [saving,   setSaving]   = useState(false);
@@ -94,7 +98,15 @@ export default function Talabalar() {
   const [studentGroups, setStudentGroups] = useState([]);
   const [allGroups, setAllGroups]         = useState([]);
 
-  useEffect(() => { fetchStudents(false); }, []);
+  useEffect(() => {
+    fetchStudents(false);
+    api.get("/groups/all")
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        setAllGroups(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {});
+  }, []);
 
   // student-group va groups faqat detail ko'rilganda lazy load qilinadi
   const loadStudentGroupData = () => {
@@ -105,12 +117,14 @@ export default function Talabalar() {
         setStudentGroups(Array.isArray(data) ? data : []);
       })
       .catch(() => {});
-    api.get("/groups/all")
-      .then((res) => {
-        const data = res.data?.data ?? res.data;
-        setAllGroups(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {});
+    if (allGroups.length === 0) {
+      api.get("/groups/all")
+        .then((res) => {
+          const data = res.data?.data ?? res.data;
+          setAllGroups(Array.isArray(data) ? data : []);
+        })
+        .catch(() => {});
+    }
   };
 
   const allIds     = students.map((s) => s.id);
@@ -131,7 +145,23 @@ export default function Talabalar() {
   const openEdit   = (s) => {
     setEditId(s.id);
     setSaveError("");
-    setForm({ phone: s.phone !== "—" ? s.phone : "+998", mail: s.email !== "—" ? s.email : "", fio: s.name !== "—" ? s.name : "", birthDate: s.birthDate !== "—" ? s.birthDate : "", address: s.address !== "—" ? s.address : "", password: "", groups: s.groups || [], groupInput: "", photoFile: null, photoPreview: null });
+    // Map existing group names to their real IDs
+    const matchedGroupIds = (s.groups || []).map(groupName => {
+      const found = allGroups.find(g => g.name === groupName);
+      return found ? found.id : groupName;
+    });
+    setForm({ 
+      phone: s.phone !== "—" ? s.phone : "+998", 
+      mail: s.email !== "—" ? s.email : "", 
+      fio: s.name !== "—" ? s.name : "", 
+      birthDate: s.birthDate && s.birthDate !== "—" ? String(s.birthDate).slice(0, 10) : "",
+      address: s.address !== "—" ? s.address : "", 
+      password: "", 
+      groups: matchedGroupIds, 
+      groupInput: "", 
+      photoFile: null, 
+      photoPreview: null 
+    });
     setDrawerOpen(true);
   };
 
@@ -153,7 +183,7 @@ export default function Talabalar() {
     name: s.fullName || s.full_name || s.name || "—",
     phone: s.phone || "—",
     email: s.email || "—",
-    birthDate: s.birthDate || s.birth_date || "—",
+    birthDate: (s.birthDate || s.birth_date) ? String(s.birthDate || s.birth_date).slice(0, 10) : "—",
     address: s.address || "—",
     createdDate: s.createdAt || s.created_at ? new Date(s.createdAt || s.created_at).toLocaleDateString() : "—",
     groups: (s.groups || []).map((g) => (typeof g === "object" ? g.name || g.label || "—" : g)),
@@ -162,11 +192,12 @@ export default function Talabalar() {
 
   const fetchStudents = (archive = false) => {
     setLoading(true);
-    api.get(archive ? "/students/archive" : "/students")
+    // Parametrsiz GET faqat 10 ta qaytaradi — yangi qo'shilganlar (katta ID) ko'rinmaydi.
+    // Shuning uchun to'liq ro'yxatni katta limit bilan olamiz.
+    api.get(archive ? "/students/archive" : "/students", { params: { page: 1, limit: 1000 } })
       .then((res) => {
         const data = res.data?.data || res.data || [];
-        if (Array.isArray(data) && data.length > 0) setStudents(data.map(mapStudent));
-        else setStudents([]);
+        setStudents(Array.isArray(data) ? data.map(mapStudent) : []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -181,33 +212,57 @@ export default function Talabalar() {
 
   const handleSave = async () => {
     setSaveError("");
-    const { fio, mail, password, phone, address, birthDate, groups } = form;
-    const isEdit = editId !== null;
-    if (!fio.trim() || !phone || !address || (!isEdit && (!mail || !password))) {
+    // Majburiy maydonlarni tekshirish
+    if (!form.fio.trim() || !form.phone.trim() || !form.address.trim()) {
       setSaveError("Barcha majburiy maydonlarni to'ldiring.");
+      return;
+    }
+    // Yangi talaba uchun email, parol va tug'ilgan sana majburiy (backend talabi)
+    if (!editId && (!form.mail.trim() || !form.password || !form.birthDate)) {
+      setSaveError("Email, parol va tug'ilgan sanani kiriting.");
       return;
     }
     setSaving(true);
     try {
+      // O'qituvchilar bilan bir xil, ishlaydigan usul: har doim FormData (multipart)
       const fd = new FormData();
-      fd.append("full_name", fio);
-      if (mail) fd.append("email", mail);
-      if (password) fd.append("password", password);
-      fd.append("phone", phone);
-      fd.append("address", address);
-      if (birthDate) fd.append("birth_date", birthDate);
-      if (groups.length) fd.append("groups", groups.join(","));
+      fd.append("full_name", form.fio.trim());
+      if (form.mail.trim()) fd.append("email", form.mail.trim());
+      if (form.password) fd.append("password", form.password);
+      fd.append("phone", form.phone.trim());
+      fd.append("address", form.address.trim());
+      // birth_date faqat kiritilgan bo'lsa yuboriladi (bo'sh satr validatsiyani buzadi)
+      if (form.birthDate) fd.append("birth_date", form.birthDate);
       if (form.photoFile) fd.append("photo", form.photoFile);
-      if (isEdit) {
-        await api.patch(`/students/${editId}`, fd, { headers: { "Content-Type": "multipart/form-data" } });
+
+      // Guruh nomlarini ID ga aylantirib, vergul bilan yuboramiz (faqat yangi yaratishda)
+      const groupIds = form.groups
+        .map((g) => {
+          const found = allGroups.find(
+            (ag) => ag.id === g || ag.name === g || String(ag.id) === String(g)
+          );
+          return found ? found.id : g;
+        })
+        .filter((id) => id !== undefined && id !== null && id !== "");
+      if (!editId && groupIds.length) fd.append("groups", groupIds.join(","));
+
+      const cfg = { headers: { "Content-Type": "multipart/form-data" } };
+      if (editId) {
+        await api.patch(`/students/${editId}`, fd, cfg);
       } else {
-        await api.post("/students", fd, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.post("/students", fd, cfg);
       }
       closeDrawer();
-      fetchStudents(false);
+      fetchStudents(isArchive);
     } catch (err) {
-      const msg = err?.response?.data?.message || "Xatolik yuz berdi. Qayta urinib ko'ring.";
-      setSaveError(Array.isArray(msg) ? msg.join(", ") : msg);
+      const status = err?.response?.status;
+      let msg = err?.response?.data?.message;
+      if (Array.isArray(msg)) msg = msg.join(", ");
+      // Backend 409 da faqat "Conflict" deydi — tushunarli xabarga aylantiramiz
+      if (status === 409 || msg === "Conflict") {
+        msg = "Bu email yoki telefon raqam allaqachon ro'yxatdan o'tgan.";
+      }
+      setSaveError(msg || err?.message || "Xatolik yuz berdi.");
     } finally {
       setSaving(false);
     }
@@ -232,7 +287,7 @@ export default function Talabalar() {
           name: s.fullName || s.full_name || s.name || "—",
           phone: s.phone || "—",
           email: s.email || "—",
-          birthDate: s.birthDate || s.birth_date || "—",
+          birthDate: (s.birthDate || s.birth_date) ? String(s.birthDate || s.birth_date).slice(0, 10) : "—",
           address: s.address || "—",
           createdDate: s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—",
           groups: apiGroups.length > 0 ? apiGroups : sgGroups,
@@ -255,7 +310,7 @@ export default function Talabalar() {
       });
   };
 
-  const col  = { fontSize: 12, color: "var(--text-muted, #9ca3af)", fontWeight: 500, padding: "10px 12px", textAlign: "left", whiteSpace: "nowrap" };
+  const col  = { fontSize: 12, color: "var(--text-muted, #6b7280)", fontWeight: 500, padding: "10px 12px", textAlign: "left", whiteSpace: "nowrap" };
   const cell = { fontSize: 13, color: "var(--text, #374151)", padding: "13px 12px", verticalAlign: "middle" };
 
   return (
@@ -265,14 +320,16 @@ export default function Talabalar() {
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 22, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text, #111)", margin: 0 }}>Talabalar</h1>
-          <p style={{ fontSize: 13, color: "#9ca3af", margin: "6px 0 0", maxWidth: 640 }}>
+          <p style={{ fontSize: 13, color: "#6b7280", margin: "6px 0 0", maxWidth: 640 }}>
             Ushbu sahifada siz Talabalar ro&apos;yxatini va ularning ma&apos;lumotlarini topasiz.
             Har bir Talaba ismi, fanlari va aloqa ma&apos;lumotlari keltirilgan.
           </p>
         </div>
-        <button onClick={openDrawer} style={{ display: "flex", alignItems: "center", gap: 6, backgroundColor: PRIMARY, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 3px 10px rgba(124,58,237,0.25)", whiteSpace: "nowrap" }}>
-          <AddIcon style={{ fontSize: 17 }} /> Talaba qo&apos;shish
-        </button>
+        {!isStudent && (
+          <button onClick={openDrawer} style={{ display: "flex", alignItems: "center", gap: 6, backgroundColor: PRIMARY, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 3px 10px rgba(124,58,237,0.25)", whiteSpace: "nowrap" }}>
+            <AddIcon style={{ fontSize: 17 }} /> Talaba qo&apos;shish
+          </button>
+        )}
       </div>
 
       {/* Card */}
@@ -281,7 +338,7 @@ export default function Talabalar() {
         {/* Search + filter row */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: "1px solid #f5f5f5", flexWrap: "wrap", gap: 10 }}>
           <div style={{ position: "relative" }}>
-            <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 17, color: "#9ca3af" }} />
+            <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 17, color: "#6b7280" }} />
             <input
               placeholder="Search"
               value={search}
@@ -295,12 +352,14 @@ export default function Talabalar() {
             <button style={{ display: "flex", alignItems: "center", gap: 6, border: "1.5px solid #e5e7eb", borderRadius: 8, padding: "7px 14px", background: "var(--card, #fff)", fontSize: 13, cursor: "pointer", color: "#374151" }}>
               <FilterListIcon style={{ fontSize: 16 }} /> Filters
             </button>
-            <button
-              onClick={toggleArchive}
-              style={{ display: "flex", alignItems: "center", gap: 6, border: `1.5px solid ${isArchive ? PRIMARY : "#e5e7eb"}`, borderRadius: 8, padding: "7px 14px", background: isArchive ? "#f3eeff" : "#fff", fontSize: 13, cursor: "pointer", color: isArchive ? PRIMARY : "#374151", fontWeight: isArchive ? 600 : 400, transition: "all 0.15s" }}
-            >
-              <Inventory2OutlinedIcon style={{ fontSize: 16 }} /> {isArchive ? "Arxivdan chiqish" : "Arxiv"}
-            </button>
+            {!isStudent && (
+              <button
+                onClick={toggleArchive}
+                style={{ display: "flex", alignItems: "center", gap: 6, border: `1.5px solid ${isArchive ? PRIMARY : "#e5e7eb"}`, borderRadius: 8, padding: "7px 14px", background: isArchive ? "#f3eeff" : "#fff", fontSize: 13, cursor: "pointer", color: isArchive ? PRIMARY : "#374151", fontWeight: isArchive ? 600 : 400, transition: "all 0.15s" }}
+              >
+                <Inventory2OutlinedIcon style={{ fontSize: 16 }} /> {isArchive ? "Arxivdan chiqish" : "Arxiv"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -309,9 +368,11 @@ export default function Talabalar() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#fafafa" }}>
-                <th style={{ ...col, width: 44, padding: "10px 16px" }}>
-                  <CB checked={allChecked} onChange={toggleAll} />
-                </th>
+                {!isStudent && (
+                  <th style={{ ...col, width: 44, padding: "10px 16px" }}>
+                    <CB checked={allChecked} onChange={toggleAll} />
+                  </th>
+                )}
                 <th style={{ ...col }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 3 }}>Nomi <SwapVertIcon style={{ fontSize: 14 }} /></span>
                 </th>
@@ -321,12 +382,14 @@ export default function Talabalar() {
                 <th style={{ ...col }}>Tug&apos;ilgan sanasi</th>
                 <th style={{ ...col }}>Manzil</th>
                 <th style={{ ...col }}>Yaratilgan sana</th>
-                <th style={{ ...col, textAlign: "right", paddingRight: 20 }}>Amallar</th>
+                {!isStudent && (
+  <th style={{ ...col, textAlign: "right", paddingRight: 20 }}>Amallar</th>
+)}
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px", color: "#9ca3af", fontSize: 14 }}>Yuklanmoqda...</td></tr>
+                <tr><td colSpan={isStudent ? 8 : 9} style={{ textAlign: "center", padding: "32px", color: "#6b7280", fontSize: 14 }}>Yuklanmoqda...</td></tr>
               )}
               {!loading && paginated.map((s) => {
                 const isSel = selected.has(s.id);
@@ -337,9 +400,11 @@ export default function Talabalar() {
                     onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.background = "var(--hover-bg, #fafafa)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = isSel ? "#fdf9ff" : "var(--card, #fff)"; }}
                   >
-                    <td style={{ ...cell, padding: "13px 16px" }}>
-                      <CB checked={isSel} onChange={() => toggleRow(s.id)} />
-                    </td>
+                    {!isStudent && (
+                      <td style={{ ...cell, padding: "13px 16px" }}>
+                        <CB checked={isSel} onChange={() => toggleRow(s.id)} />
+                      </td>
+                    )}
 
                     {/* Nomi */}
                     <td style={{ ...cell }}>
@@ -371,13 +436,13 @@ export default function Talabalar() {
                     {/* Amallar */}
                     <td style={{ ...cell, textAlign: "right", paddingRight: 16 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
-                        <button onClick={() => viewStudent(s.id)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 3, transition: "color .15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button onClick={() => viewStudent(s.id)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 3, transition: "color .15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <VisibilityOutlinedIcon style={{ fontSize: 17 }} />
                         </button>
-                        <button onClick={() => { setDeleteId(s.id); setDeleteError(""); }} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 3, transition: "color .15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button onClick={() => { setDeleteId(s.id); setDeleteError(""); }} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 3, transition: "color .15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <DeleteOutlinedIcon style={{ fontSize: 17 }} />
                         </button>
-                        <button onClick={() => openEdit(s)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 3, transition: "color .15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}>
+                        <button onClick={() => openEdit(s)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 3, transition: "color .15s" }} onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)} onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}>
                           <EditOutlinedIcon style={{ fontSize: 17 }} />
                         </button>
                       </div>
@@ -399,7 +464,7 @@ export default function Talabalar() {
           <div style={{ display: "flex", gap: 4 }}>
             {pages.map((p, i) => (
               <button key={i} onClick={() => typeof p === "number" && setPage(p)}
-                style={{ width: 34, height: 34, borderRadius: 8, border: "none", background: safePage === p ? PRIMARY : "transparent", color: safePage === p ? "#fff" : p === "..." ? "#9ca3af" : "#374151", fontSize: 13, fontWeight: safePage === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all .15s" }}>
+                style={{ width: 34, height: 34, borderRadius: 8, border: "none", background: safePage === p ? PRIMARY : "transparent", color: safePage === p ? "#fff" : p === "..." ? "#6b7280" : "#374151", fontSize: 13, fontWeight: safePage === p ? 600 : 400, cursor: typeof p === "number" ? "pointer" : "default", transition: "all .15s" }}>
                 {p}
               </button>
             ))}
@@ -429,9 +494,9 @@ export default function Talabalar() {
             <div style={{ padding: "20px 20px 12px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Guruhga biriktirish</p>
-                <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>Bir yoki bir nechta guruhni tanlang</p>
+                <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>Bir yoki bir nechta guruhni tanlang</p>
               </div>
-              <button onClick={closeGroupModal} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 2, display: "flex" }}>
+              <button onClick={closeGroupModal} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", padding: 2, display: "flex" }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
@@ -439,7 +504,7 @@ export default function Talabalar() {
             {/* Search */}
             <div style={{ padding: "0 16px 10px" }}>
               <div style={{ position: "relative" }}>
-                <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#9ca3af" }} />
+                <SearchIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#6b7280" }} />
                 <input
                   placeholder="Guruh qidirish..."
                   value={groupSearch}
@@ -454,12 +519,12 @@ export default function Talabalar() {
 
             {/* Group list */}
             <div style={{ maxHeight: 240, overflowY: "auto", padding: "0 16px", borderTop: "1px solid #f5f5f5", borderBottom: "1px solid #f5f5f5" }}>
-              {ALL_GROUPS.filter((g) => g.toLowerCase().includes(groupSearch.toLowerCase())).map((g) => {
-                const checked = tempGroups.includes(g);
+              {allGroups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase())).map((g) => {
+                const checked = tempGroups.includes(g.id);
                 return (
                   <div
-                    key={g}
-                    onClick={() => toggleTempGroup(g)}
+                    key={g.id}
+                    onClick={() => toggleTempGroup(g.id)}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 4px", cursor: "pointer", borderBottom: "1px solid #f9f9f9" }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -468,12 +533,12 @@ export default function Talabalar() {
                     <div style={{ width: 18, height: 18, borderRadius: 5, border: checked ? "none" : "1.5px solid #d1d5db", backgroundColor: checked ? PRIMARY : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s" }}>
                       {checked && <svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
                     </div>
-                    <span style={{ fontSize: 14, color: "var(--text, #111)", fontWeight: checked ? 500 : 400 }}>{g}</span>
+                    <span style={{ fontSize: 14, color: "var(--text, #111)", fontWeight: checked ? 500 : 400 }}>{g.name}</span>
                   </div>
                 );
               })}
-              {ALL_GROUPS.filter((g) => g.toLowerCase().includes(groupSearch.toLowerCase())).length === 0 && (
-                <p style={{ fontSize: 13, color: "#9ca3af", textAlign: "center", padding: "20px 0" }}>Guruh topilmadi</p>
+              {allGroups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase())).length === 0 && (
+                <p style={{ fontSize: 13, color: "#6b7280", textAlign: "center", padding: "20px 0" }}>Guruh topilmadi</p>
               )}
             </div>
 
@@ -500,9 +565,9 @@ export default function Talabalar() {
         <div style={{ padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>{editId ? "Talabani tahrirlash" : "Talaba qo'shish"}</p>
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: "4px 0 0" }}>{editId ? "Talaba ma'lumotlarini yangilang." : "Bu yerda siz yangi Talaba qo'shishingiz mumkin."}</p>
+            <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0 0" }}>{editId ? "Talaba ma'lumotlarini yangilang." : "Bu yerda siz yangi Talaba qo'shishingiz mumkin."}</p>
           </div>
-          <button onClick={closeDrawer} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+          <button onClick={closeDrawer} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
             <CloseIcon style={{ fontSize: 20 }} />
           </button>
         </div>
@@ -527,12 +592,16 @@ export default function Talabalar() {
             <label style={{ fontSize: 13, fontWeight: 500, color: "#374151", display: "block", marginBottom: 8 }}>Guruh</label>
             {form.groups.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-                {form.groups.map((g) => (
-                  <span key={g} style={{ display: "flex", alignItems: "center", gap: 4, background: "#6d28d9", color: "#fff", fontSize: 12, fontWeight: 500, padding: "3px 10px", borderRadius: 6 }}>
-                    {g}
-                    <button onClick={() => set("groups", form.groups.filter((x) => x !== g))} style={{ border: "none", background: "none", cursor: "pointer", color: "#fff", padding: 0, fontSize: 14, lineHeight: 1 }}>×</button>
-                  </span>
-                ))}
+                {form.groups.map((g) => {
+                  const groupObj = allGroups.find(x => x.id === g || String(x.id) === String(g));
+                  const nameToShow = groupObj ? groupObj.name : g;
+                  return (
+                    <span key={g} style={{ display: "flex", alignItems: "center", gap: 4, background: "#6d28d9", color: "#fff", fontSize: 12, fontWeight: 500, padding: "3px 10px", borderRadius: 6 }}>
+                      {nameToShow}
+                      <button onClick={() => set("groups", form.groups.filter((x) => x !== g))} style={{ border: "none", background: "none", cursor: "pointer", color: "#fff", padding: 0, fontSize: 14, lineHeight: 1 }}>×</button>
+                    </span>
+                  );
+                })}
               </div>
             )}
             <button
@@ -566,12 +635,12 @@ export default function Talabalar() {
               ) : (
                 <>
                   <div style={{ width: 40, height: 40, background: "#f3f4f6", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                   </div>
                   <p style={{ margin: 0, fontSize: 13, textAlign: "center", color: "#374151" }}>
                     <span style={{ color: PRIMARY, fontWeight: 600 }}>Click to upload</span> or drag and drop
                   </p>
-                  <p style={{ margin: 0, fontSize: 11, color: "#9ca3af" }}>JPG or PNG (max. 2 MB)</p>
+                  <p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>JPG or PNG (max. 2 MB)</p>
                 </>
               )}
             </div>
@@ -632,13 +701,13 @@ export default function Talabalar() {
           <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 420, background: "var(--card, #fff)", borderRadius: 16, boxShadow: "0 12px 40px rgba(0,0,0,0.18)", zIndex: 410, overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 14px", borderBottom: "1px solid #f0f0f0" }}>
               <p style={{ fontWeight: 700, fontSize: 16, color: "var(--text, #111)", margin: 0 }}>Talaba ma&apos;lumotlari</p>
-              <button onClick={() => setDetailStudent(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", display: "flex", padding: 4 }}>
+              <button onClick={() => setDetailStudent(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#6b7280", display: "flex", padding: 4 }}>
                 <CloseIcon style={{ fontSize: 20 }} />
               </button>
             </div>
             <div style={{ padding: "20px 24px 24px" }}>
               {detailLoading ? (
-                <p style={{ textAlign: "center", color: "#9ca3af", fontSize: 14, padding: "24px 0" }}>Yuklanmoqda...</p>
+                <p style={{ textAlign: "center", color: "#6b7280", fontSize: 14, padding: "24px 0" }}>Yuklanmoqda...</p>
               ) : detailStudent.name ? (
                 <>
                   <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
@@ -649,7 +718,7 @@ export default function Talabalar() {
                     </div>
                     <div>
                       <p style={{ margin: 0, fontWeight: 700, fontSize: 16, color: "var(--text, #111)" }}>{detailStudent.name}</p>
-                      <p style={{ margin: "3px 0 0", fontSize: 12, color: "#9ca3af" }}>{detailStudent.email}</p>
+                      <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6b7280" }}>{detailStudent.email}</p>
                     </div>
                   </div>
                   {[
@@ -659,13 +728,13 @@ export default function Talabalar() {
                     { label: "Yaratilgan",     value: detailStudent.createdDate },
                   ].map(({ label, value }) => (
                     <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f5f5f5" }}>
-                      <span style={{ fontSize: 13, color: "#9ca3af" }}>{label}</span>
+                      <span style={{ fontSize: 13, color: "#6b7280" }}>{label}</span>
                       <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text, #111)" }}>{value}</span>
                     </div>
                   ))}
                   {detailStudent.groups?.length > 0 && (
                     <div style={{ marginTop: 14 }}>
-                      <p style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>Guruhlar</p>
+                      <p style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>Guruhlar</p>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                         {detailStudent.groups.map((g, i) => (
                           <span key={i} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "#f3f4f6", color: "#374151", border: "1px solid #e5e7eb", fontWeight: 500 }}>{g}</span>
@@ -675,7 +744,7 @@ export default function Talabalar() {
                   )}
                 </>
               ) : (
-                <p style={{ textAlign: "center", color: "#9ca3af", fontSize: 14, padding: "24px 0" }}>Ma&apos;lumot topilmadi</p>
+                <p style={{ textAlign: "center", color: "#6b7280", fontSize: 14, padding: "24px 0" }}>Ma&apos;lumot topilmadi</p>
               )}
             </div>
           </div>
