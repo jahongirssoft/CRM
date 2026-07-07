@@ -3,6 +3,7 @@ import api from "../../api/axios";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import TeacherGroupDetail from "./TeacherGroupDetail";
 
 const PRIMARY = "#7c3aed";
 
@@ -24,16 +25,15 @@ export default function TeacherGuruhlar({ darkMode = false, collecting = false }
   const [loading, setLoading] = useState(true);
   const [isArchive, setIsArchive] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedGroup, setSelectedGroup] = useState(null); // guruh detali
 
   useEffect(() => {
     let cancelled = false;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
-    // Teacher o'z guruhlari; ishlamasa (403/404) — barcha guruhlarga fallback
-    const primary = isArchive ? "/teachers/my/groups?archive=true" : "/teachers/my/groups";
-    api.get(primary)
-      .then((res) => res)
-      .catch(() => api.get(isArchive ? "/groups/archive" : "/groups/all"))
+    // Faqat teacher o'z guruhlari. Backend arxiv filtrini qo'llamaydi, shuning uchun
+    // barcha guruhlarni olib, status bo'yicha client tomonda ajratamiz (pastda).
+    api.get("/teachers/my/groups")
       .then((res) => {
         if (cancelled) return;
         const data = res.data?.data ?? res.data ?? [];
@@ -49,9 +49,13 @@ export default function TeacherGuruhlar({ darkMode = false, collecting = false }
       (Array.isArray(g.students) ? g.students.length : (g.studentCount ?? 0));
     const teacherName = (Array.isArray(g.teachers) ? g.teachers : [])
       .map((tt) => tt.full_name ?? tt.fullName ?? tt.name).filter(Boolean).join(", ");
+    const statusStr = String(g.status ?? "").toLowerCase();
+    const archived = g.is_archived === true || g.archived === true || ["archive", "archived", "inactive", "completed", "finished", "tugagan", "yopilgan"].includes(statusStr);
     return {
+      _raw: g,
       id: g.id ?? i + 1,
-      active: g.active ?? g.is_active ?? !isArchive,
+      archived,
+      active: g.active ?? g.is_active ?? (statusStr ? statusStr === "active" : !archived),
       name: g.name ?? g.groupName ?? `Guruh #${g.id ?? i + 1}`,
       course: g.course?.name ?? g.courseName ?? g.kurs ?? "—",
       duration: g.course?.duration_month ?? g.duration_month ?? g.durationMonth,
@@ -64,10 +68,20 @@ export default function TeacherGuruhlar({ darkMode = false, collecting = false }
     };
   };
 
-  const rows = groups.map(mapGroup).filter((g) => (collecting ? g.collecting : true));
+  // Backend /teachers/my/groups arxiv paramni e'tiborsiz qoldiradi — shuning uchun
+  // client tomonda status bo'yicha ajratamiz (arxiv tab faqat arxivlangan guruhlar).
+  const rows = groups.map(mapGroup).filter((g) => {
+    if (collecting) return g.collecting;
+    return isArchive ? g.archived : !g.archived;
+  });
 
   const col = { fontSize: 12.5, color: t.textMuted, fontWeight: 600, padding: "16px 18px", textAlign: "left", whiteSpace: "nowrap" };
   const cell = { fontSize: 13.5, color: t.text, padding: "18px 18px", verticalAlign: "middle" };
+
+  // Guruh tanlangan bo'lsa — detal sahifasini ochamiz
+  if (selectedGroup) {
+    return <TeacherGroupDetail group={selectedGroup} darkMode={darkMode} onBack={() => setSelectedGroup(null)} />;
+  }
 
   return (
     <div style={{ padding: "24px 28px", fontFamily: "'Inter', sans-serif", background: t.bg, minHeight: "100%" }}>
@@ -118,7 +132,8 @@ export default function TeacherGuruhlar({ darkMode = false, collecting = false }
                 <tr><td colSpan={9} style={{ textAlign: "center", padding: "44px", color: t.textMuted, fontSize: 14 }}>Guruhlar mavjud emas.</td></tr>
               )}
               {!loading && rows.map((g) => (
-                <tr key={g.id} style={{ borderTop: `1px solid ${t.border}` }}
+                <tr key={g.id} style={{ borderTop: `1px solid ${t.border}`, cursor: "pointer" }}
+                  onClick={() => setSelectedGroup(g._raw)}
                   onMouseEnter={(e) => (e.currentTarget.style.background = t.hover)}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
                   {/* Status */}
@@ -153,7 +168,7 @@ export default function TeacherGuruhlar({ darkMode = false, collecting = false }
                   <td style={{ ...cell, textAlign: "center", fontWeight: 700 }}>{g.students}</td>
                   {/* Menu */}
                   <td style={{ ...cell, textAlign: "right" }}>
-                    <button style={{ border: "none", background: "none", cursor: "pointer", color: t.textMuted, display: "inline-flex", padding: 4 }}>
+                    <button onClick={(e) => e.stopPropagation()} style={{ border: "none", background: "none", cursor: "pointer", color: t.textMuted, display: "inline-flex", padding: 4 }}>
                       <MoreVertIcon style={{ fontSize: 20 }} />
                     </button>
                   </td>

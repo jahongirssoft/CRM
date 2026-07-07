@@ -47,6 +47,7 @@ import Talabalar from "../talabalar/Talabalar";
 import Guruhlar  from "../guruhlar/Guruhlar";
 import Guruhlarim from "../guruhlar/Guruhlarim";
 import TeacherGuruhlar from "../teacher/TeacherGuruhlar";
+import TeacherProfil from "../teacher/TeacherProfil";
 
 const PRIMARY = "#7c3aed";
 const PRIMARY_LIGHT = "#6d28d9";
@@ -74,8 +75,12 @@ const getNavItems = (role) => {
     ];
   } else if (r === "TEACHER") {
     return [
-      { label: "Guruhlar", icon: LayersIcon, page: "teacher-guruhlar" },
-      { label: "Yig'ilayotgan guruhlar", icon: GroupIcon, page: "teacher-collecting" },
+      {
+        label: "Guruhlar", icon: LayersIcon, children: [
+          { label: "Guruhlar", page: "teacher-guruhlar" },
+          { label: "Yig'ilayotgan guruhlar", page: "teacher-collecting" },
+        ],
+      },
       { label: "Profil", icon: PersonIcon, page: "teacher-profil" },
     ];
   } else {
@@ -152,6 +157,8 @@ export default function Dashboard() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [pwdModalOpen, setPwdModalOpen] = useState(false);
   const [flyoutOpen, setFlyoutOpen] = useState(false);
+  const [addMenuOpen, setAddMenuOpen] = useState(false); // "Qo'shish" dropdown
+  const [openGroups, setOpenGroups] = useState({ Guruhlar: true }); // teacher akkardion
   const [activePage, setActivePage] = useState(() => urlPage ? urlToPage(urlPage) : (localStorage.getItem("activePage_page") || "asosiy"));
   const [boshqarishTab, setBoshqarishTab] = useState(() => localStorage.getItem("activePage_btab") || "Kurslar");
 
@@ -171,14 +178,17 @@ export default function Dashboard() {
   const isStudent = userRole === ROLES.STUDENT;
   const navItems = getNavItems(userRole);
 
+  // Nested (children) menyularni tekislaymiz — ruxsat/home hisoblash uchun
+  const flatItems = navItems.flatMap((i) => (i.children ? i.children : [i]));
+
   // Rolga qarab ruxsat etilgan sahifalar (nav menyudan olinadi)
-  const homeItem = navItems[0];
-  const allowedPages = navItems.map((i) => i.page);
+  const homeItem = flatItems[0];
+  const allowedPages = flatItems.map((i) => i.page);
 
   // Rol o'zgarganda yoki ruxsatsiz sahifaga o'tishga urinilганda — bosh sahifaga qaytarish
   useEffect(() => {
     const validPage = allowedPages.includes(activePage);
-    const validLabel = navItems.some((i) => i.label === active);
+    const validLabel = flatItems.some((i) => i.label === active);
     if (!validPage || !validLabel) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActive(homeItem.label);
@@ -272,6 +282,28 @@ export default function Dashboard() {
       localStorage.setItem("activePage_nav", item.label);
       localStorage.setItem("activePage_page", item.page);
     }
+  };
+
+  // "Qo'shish" tugmasi menyusi — rolga qarab qo'shsa bo'ladigan narsalar
+  const addMenuItems = userRole === ROLES.ADMIN ? [
+    { label: "Talaba qo'shish", Icon: PeopleIcon, page: "talabalar" },
+    { label: "O'qituvchi qo'shish", Icon: PersonIcon, page: "o'qituvchilar" },
+    { label: "Guruh qo'shish", Icon: LayersIcon, page: "guruhlar" },
+  ] : [];
+
+  // Menyudan tanlanганда: kerakли sahifага o'tиб, o'sha sahifадаги qo'shish oynasini ochamiz
+  const handleQuickAdd = (page) => {
+    setAddMenuOpen(false);
+    sessionStorage.setItem("__quickAdd", page);
+    const item = navItems.find((i) => i.page === page);
+    if (item) {
+      setActive(item.label);
+      localStorage.setItem("activePage_nav", item.label);
+    }
+    setActivePage(page);
+    localStorage.setItem("activePage_page", page);
+    // Sahifa allaqачон ochiq bo'lsa mount bo'lmайди — event bilan xabar beramiz
+    setTimeout(() => window.dispatchEvent(new Event("quickadd")), 60);
   };
 
   const handleFlyoutItem = (label) => {
@@ -387,6 +419,60 @@ const sidebarW = collapsed ? 64 : 230;
         <nav style={{ flex: 1, padding: "12px 0" }}>
           {navItems.map((item) => {
             const Icon = item.icon;
+
+            // ── Akkardion guruh (bosilganda pastga ochiladi) ──
+            if (item.children) {
+              const isOpen = openGroups[item.label] ?? true;
+              return (
+                <div key={item.label}>
+                  <button
+                    onClick={() => setOpenGroups((p) => ({ ...p, [item.label]: !(p[item.label] ?? true) }))}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      width: collapsed ? "calc(100% - 16px)" : "calc(100% - 20px)",
+                      padding: collapsed ? "11px 0" : "11px 16px",
+                      margin: collapsed ? "2px 8px" : "2px 10px",
+                      borderRadius: 10, border: "none", background: "transparent",
+                      color: t.textSec, fontWeight: 600, fontSize: 13.5, cursor: "pointer",
+                      justifyContent: collapsed ? "center" : "flex-start",
+                    }}
+                  >
+                    <Icon style={{ fontSize: 19, color: t.textMuted, flexShrink: 0 }} />
+                    {!collapsed && <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>}
+                    {!collapsed && (
+                      <ExpandMoreIcon style={{ fontSize: 18, color: t.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+                    )}
+                  </button>
+                  {!collapsed && isOpen && item.children.map((c) => {
+                    const cActive = activePage === c.page;
+                    return (
+                      <button
+                        key={c.label}
+                        onClick={() => {
+                          setActive(c.label); setActivePage(c.page);
+                          localStorage.setItem("activePage_nav", c.label);
+                          localStorage.setItem("activePage_page", c.page);
+                          setFlyoutOpen(false); setMobileOpen(false);
+                        }}
+                        style={{
+                          display: "block", width: "calc(100% - 20px)", textAlign: "left",
+                          padding: "10px 16px 10px 46px", margin: "2px 10px", borderRadius: 10,
+                          border: "none", background: cActive ? PRIMARY : "transparent",
+                          color: cActive ? "#fff" : t.textSec, fontWeight: cActive ? 600 : 400,
+                          fontSize: 13.5, cursor: "pointer", transition: "all 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => { if (!cActive) { e.currentTarget.style.background = darkMode ? "#334155" : "#f0eeff"; e.currentTarget.style.color = PRIMARY; } }}
+                        onMouseLeave={(e) => { if (!cActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = t.textSec; } }}
+                      >
+                        {c.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            }
+
+            // ── Oddiy (flat) element ──
             const isActive = active === item.label;
             return (
               <button
@@ -403,7 +489,7 @@ const sidebarW = collapsed ? 64 : 230;
                   fontWeight: isActive ? 600 : 400,
                   fontSize: 13.5,
                   transition: "all 0.15s ease",
-                  width: collapsed ? "auto" : "calc(100% - 20px)",
+                  width: collapsed ? "calc(100% - 16px)" : "calc(100% - 20px)",
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
@@ -639,25 +725,62 @@ const sidebarW = collapsed ? 64 : 230;
             </button>
 
             {/* Qo'shish */}
-            {!isStudent && (
-              <button style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                background: PRIMARY,
-                color: "#fff",
-                border: "none",
-                borderRadius: 8,
-                padding: "7px 14px",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                boxShadow: "0 3px 10px rgba(124,58,237,0.28)",
-              }}>
-                <AddIcon style={{ fontSize: 17 }} />
-                Qo&apos;shish
-                <KeyboardArrowDownIcon style={{ fontSize: 17, marginLeft: 2 }} />
-              </button>
+            {addMenuItems.length > 0 && (
+              <div style={{ position: "relative" }}>
+                <button
+                  onClick={() => setAddMenuOpen((o) => !o)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: PRIMARY,
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "7px 14px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    boxShadow: "0 3px 10px rgba(124,58,237,0.28)",
+                  }}
+                >
+                  <AddIcon style={{ fontSize: 17 }} />
+                  Qo&apos;shish
+                  <KeyboardArrowDownIcon style={{ fontSize: 17, marginLeft: 2, transform: addMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.18s" }} />
+                </button>
+
+                {addMenuOpen && (
+                  <>
+                    <div onClick={() => setAddMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 998 }} />
+                    <div style={{
+                      position: "absolute",
+                      top: "calc(100% + 8px)",
+                      left: 0,
+                      zIndex: 999,
+                      width: 208,
+                      background: t.card,
+                      borderRadius: 12,
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.16)",
+                      border: `1px solid ${t.border}`,
+                      overflow: "hidden",
+                      padding: "6px 0",
+                    }}>
+                      {addMenuItems.map((it) => (
+                        <button
+                          key={it.page}
+                          onClick={() => handleQuickAdd(it.page)}
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", border: "none", background: "transparent", cursor: "pointer", fontSize: 13.5, color: t.text, textAlign: "left" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = darkMode ? "#334155" : "#f5f3ff")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        >
+                          <it.Icon style={{ fontSize: 18, color: PRIMARY }} />
+                          {it.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             )}
 
             {/* Search */}
@@ -840,22 +963,7 @@ const sidebarW = collapsed ? 64 : 230;
           ) : activePage === "teacher-collecting" ? (
             <TeacherGuruhlar darkMode={darkMode} collecting={true} />
           ) : activePage === "teacher-profil" ? (
-            <div style={{ padding: "28px 24px" }}>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: t.text, marginBottom: 8 }}>Profil</h1>
-              <p style={{ fontSize: 13.5, color: t.textSec, marginBottom: 24 }}>O&apos;qituvchi ma&apos;lumotlari.</p>
-              <div style={{ background: t.card, borderRadius: 12, padding: 24, border: `1px solid ${t.border}`, maxWidth: 450 }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  <div>
-                    <label style={{ fontSize: 12, color: t.textSec, display: "block", marginBottom: 6 }}>Email</label>
-                    <input type="text" value={currentUser?.email ?? ""} readOnly style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${t.border}`, borderRadius: 8, background: t.bg, color: t.text, fontSize: 13, outline: "none" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 12, color: t.textSec, display: "block", marginBottom: 6 }}>Rol</label>
-                    <input type="text" value={userRole} readOnly style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${t.border}`, borderRadius: 8, background: t.bg, color: t.text, fontSize: 13, outline: "none" }} />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TeacherProfil darkMode={darkMode} />
           ) : activePage === "boshqarish" ? (
             <Boshqarish initialTab={boshqarishTab} key={boshqarishTab} darkMode={darkMode} />
           ) : activePage === "o'qituvchilar" ? (

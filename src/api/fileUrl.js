@@ -1,10 +1,16 @@
 const FILE_BASE = "https://najot-edu.softwareengineer.uz/files";
 
+// Profil rasmlari (talaba/o'qituvchi avatar) — /files/{fayl} (bitta files)
 export const imgUrl = (filename) => {
   if (!filename) return null;
-  // Agar to'liq URL bo'lsa, to'g'ridan ishlat
   if (filename.startsWith("http")) return filename;
-  // Fayllar (rasm/video) bu backendда /files/files/{fayl} dan beriladi (public)
+  return `${FILE_BASE}/${filename}`;
+};
+
+// Dars fayllari (video, uy vazifa) — /files/files/{fayl} (ikkita files)
+export const lessonFileUrl = (filename) => {
+  if (!filename) return null;
+  if (filename.startsWith("http")) return filename;
   return `${FILE_BASE}/files/${filename}`;
 };
 
@@ -15,4 +21,4 @@ export const getPhotoUrl = (obj) => {
   return imgUrl(raw);
 };
 
-export const videoUrl = (filename) => filename ? `${FILE_BASE}/files/${filename}` : null;
+export const videoUrl = lessonFileUrl;

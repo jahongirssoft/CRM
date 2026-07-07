@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../api/axios";
-import { imgUrl } from "../../api/fileUrl";
+import { lessonFileUrl } from "../../api/fileUrl";
 import { getCurrentUser } from "../../api/auth";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -84,7 +84,7 @@ const resolveVideo = (v) => {
   const vm = s.match(/vimeo\.com\/(\d+)/);
   if (vm) return { type: "iframe", src: `https://player.vimeo.com/video/${vm[1]}` };
   if (s.startsWith("http")) return { type: "video", src: s };
-  return { type: "video", src: imgUrl(s) }; // fayl — public /files/files/{fayl}
+  return { type: "video", src: lessonFileUrl(s) }; // fayl — public /files/files/{fayl}
 };
 
 export default function Guruhlarim({ darkMode }) {
@@ -351,7 +351,7 @@ export default function Guruhlarim({ darkMode }) {
                           <span style={{ fontSize: 13, color: t.textMuted, fontWeight: 600 }}>Fayllar soni: {h.file ? 1 : 0}</span>
                         </div>
                         {h.file && (
-                          <a href={imgUrl(h.file)} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: PRIMARY, fontWeight: 600, textDecoration: "none" }}>
+                          <a href={lessonFileUrl(h.file)} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: PRIMARY, fontWeight: 600, textDecoration: "none" }}>
                             📎 Vazifa faylini yuklab olish
                           </a>
                         )}

@@ -184,6 +184,19 @@ export default function Oqituvchilar() {
   };
 
   const openDrawer  = () => { setForm(initForm()); setSaveError(""); setEditId(null); setDrawerOpen(true); };
+
+  // Header'даги "Qo'shish" tugmasidan chaqirilганда qo'shish oynasini ochamiz
+  useEffect(() => {
+    const trigger = () => {
+      if (sessionStorage.getItem("__quickAdd") === "o'qituvchilar") {
+        sessionStorage.removeItem("__quickAdd");
+        openDrawer();
+      }
+    };
+    trigger();
+    window.addEventListener("quickadd", trigger);
+    return () => window.removeEventListener("quickadd", trigger);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const openEdit    = (t) => {
     setEditId(t.id);
     setSaveError("");

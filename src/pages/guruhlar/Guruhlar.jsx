@@ -2666,6 +2666,19 @@ export default function Guruhlar({ darkMode, onGroupSelect }) {
   const openEditDrawer = (g) => { setEditId(g.id); setForm({ name: g.name, kurs: "", xona: "", kunlar: [], vaqt: g.vaqt !== "—" ? g.vaqt : "09:00", boshlanish: "", tavsif: "", talabalar: [], oqituvchilar: [] }); setDrawerOpen(true); loadDrawerData(); };
   const closeDrawer    = () => { setDrawerOpen(false); setEditId(null); setFormError(""); };
 
+  // Header'даги "Qo'shish" tugmasidan chaqirilганда qo'shish oynasini ochamiz
+  useEffect(() => {
+    const trigger = () => {
+      if (sessionStorage.getItem("__quickAdd") === "guruhlar") {
+        sessionStorage.removeItem("__quickAdd");
+        openDrawer();
+      }
+    };
+    trigger();
+    window.addEventListener("quickadd", trigger);
+    return () => window.removeEventListener("quickadd", trigger);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const DAY_MAP = {
     "Dushanba": "MONDAY", "Seshanba": "TUESDAY", "Chorshanba": "WEDNESDAY",
     "Payshanba": "THURSDAY", "Juma": "FRIDAY", "Shanba": "SATURDAY", "Yakshanba": "SUNDAY",
